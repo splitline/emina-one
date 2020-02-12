@@ -18,6 +18,19 @@ const styles = StyleSheet.create({
   },
 });
 
+class ListItem extends React.PureComponent {
+  render() {
+    return (
+      <List.Item
+        title={this.props.item.name}
+        description={`${this.props.item.episode} / ${this.props.item.season}`}
+        right={() => <List.Subheader>{this.props.item.fansub}</List.Subheader>}
+        onPress={() => { this.props.navigation.navigate("Video", { animeId: this.props.item.id }) }}
+      />
+    );
+  }
+}
+
 class AnimeList extends React.Component {
   constructor(props) {
     super(props);
@@ -54,12 +67,7 @@ class AnimeList extends React.Component {
 
   renderRow = ({ item }) => {
     return (
-      <List.Item
-        title={item.name}
-        description={`${item.episode} / ${item.season}`}
-        right={() => <List.Subheader>{item.fansub}</List.Subheader>}
-        onPress={() => { this.navigation.navigate("Video", { animeId: item.id }) }}
-      />
+      <ListItem item={item} navigation={this.navigation} />
     )
   }
 
@@ -75,7 +83,6 @@ class AnimeList extends React.Component {
           data={animeData}
           renderItem={this.renderRow}
           keyExtractor={item => item.id}
-          initialNumToRender={16}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => this.fetchData()} />}
         />
       </SafeAreaView>
