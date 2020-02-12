@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, FlatList, SafeAreaView, ScrollView, RefreshControl } from 'react-native';
+import { Text, View, StyleSheet, FlatList, SafeAreaView, RefreshControl } from 'react-native';
 import { parse } from 'node-html-parser';
 
 import { List, Appbar, Searchbar } from 'react-native-paper';
@@ -21,8 +21,10 @@ const styles = StyleSheet.create({
 class AnimeList extends React.Component {
   constructor(props) {
     super(props);
+    this.navigation = this.props.navigation;
     this.state = {
-      animeData: []
+      animeData: [],
+      refreshing: true
     };
   }
 
@@ -50,13 +52,13 @@ class AnimeList extends React.Component {
       })
   }
 
-  renderRow = rowData => {
+  renderRow = ({ item }) => {
     return (
       <List.Item
-        title={rowData.name}
-        description={`${rowData.episode} / ${rowData.season}`}
-        right={() => <List.Subheader>{rowData.fansub}</List.Subheader>}
-        onPress={() => { }}
+        title={item.name}
+        description={`${item.episode} / ${item.season}`}
+        right={() => <List.Subheader>{item.fansub}</List.Subheader>}
+        onPress={() => { this.navigation.navigate("Video", { animeId: item.id }) }}
       />
     )
   }
@@ -67,12 +69,13 @@ class AnimeList extends React.Component {
       <SafeAreaView>
         <Appbar.Header>
           <Appbar.Content title="所有動畫" />
+          <Appbar.Action icon="information-outline" onPress={() => { }} />
         </Appbar.Header>
         <FlatList
           data={animeData}
-          renderItem={({ item }) => this.renderRow(item)}
+          renderItem={this.renderRow}
           keyExtractor={item => item.id}
-          initialNumToRender={10}
+          initialNumToRender={16}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => this.fetchData()} />}
         />
       </SafeAreaView>
