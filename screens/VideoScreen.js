@@ -1,28 +1,25 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, StatusBar, BackHandler, FlatList, Dimensions } from 'react-native';
+import { Text, View, StyleSheet, StatusBar, BackHandler, FlatList, Dimensions, Share, AsyncStorage } from 'react-native';
 import { parse } from 'node-html-parser';
-import { Title, Button, ActivityIndicator, Surface } from 'react-native-paper'
+import { Title, Button, ActivityIndicator, Surface, Divider, Caption, IconButton } from 'react-native-paper';
 
 import { ScreenOrientation } from 'expo';
 import { Video } from 'expo-av';
 import VideoPlayer from 'expo-video-player';
+import * as IntentLauncher from 'expo-intent-launcher';
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    button: {
-        width: "23%",
-        margin: 4,
-    },
-});
+
+
 
 export default class VideoScreen extends React.Component {
     constructor(props) {
         super(props);
         this.animeId = this.props.route.params.animeId;
+        this.animeData = this.props.route.params.animeData;
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => this.handleBackPress());
         this.state = {
+            favorites: {},
+
             loadingList: true,
             videoList: [],
             playingIndex: 0,
@@ -37,6 +34,13 @@ export default class VideoScreen extends React.Component {
     }
 
     componentDidMount() {
+        AsyncStorage.getItem("@EminaOne:favorites")
+            .then(favorites => {
+                if (favorites !== null) {
+                    favorites = JSON.parse(favorites);
+                    this.setState({ favorites })
+                }
+            });
         this.fetchVideoList()
             .then(result => this.fetchSourceUri(result[0].url));
     }
@@ -90,7 +94,7 @@ export default class VideoScreen extends React.Component {
     fetchVideoList() {
         const { page } = this.state;
         this.setState({ loadingList: true });
-        return fetch(`https://anime1.me/page/${page}/?cat=${this.animeId}`, { headers: { Cookie: "videopassword=1" }, credentials: "include" })
+        return fetch(`https://anime1.me/page/${page}/?cat=${this.animeId}`)
             .then(r => r.text())
             .then(html => {
                 if (html.includes("上一頁")) this.setState({ page: page + 1 });
@@ -99,6 +103,7 @@ export default class VideoScreen extends React.Component {
                 const result = document.querySelectorAll("article")
                     .map(elem => ({
                         title: elem.querySelector(".entry-title").text,
+                        date: elem.querySelector('time').text,
                         url: elem.querySelector('iframe')?.getAttribute('src') || elem.querySelector('button')?.getAttribute('data-src')
                     }));
 
@@ -125,6 +130,29 @@ export default class VideoScreen extends React.Component {
             }));
     }
 
+    toggleFavorite() {
+        AsyncStorage.getItem("@EminaOne:favorites")
+            .then(result => {
+                let favorites = {};
+                if (result !== null)
+                    favorites = JSON.parse(result);
+                this.animeId in this.state.favorites ?
+                    delete favorites[this.animeId] :
+                    favorites[this.animeId] = this.animeData;
+                AsyncStorage.setItem("@EminaOne:favorites", JSON.stringify(favorites))
+                this.setState({ favorites })
+            })
+    }
+
+    loadMoreEpisode = () =>
+        (
+            <Button
+                disabled={this.state.loadingList}
+                loading={this.state.loadingList}
+                onPress={() => this.fetchVideoList()}>
+                {this.state.loadingList ? "載入章節列表中" : "載入更多集數"}
+            </Button>
+        )
 
     render() {
         const { loadingList, videoList, playingIndex, page,
@@ -134,13 +162,13 @@ export default class VideoScreen extends React.Component {
                 <StatusBar hidden />
                 <View style={styles.container}>
                     {loadingVideo ?
-                        <View style={{
-                            backgroundColor: "black",
-                            height: pageWidth * 9 / 16,
-                            width: pageWidth,
-                            flex: 0, justifyContent: 'center', alignItems: 'center'
-                        }}>
+                        <View style={[
+                            styles.videoPlaceholder, {
+                                height: pageWidth * 9 / 16,
+                                width: pageWidth
+                            }]}>
                             <ActivityIndicator animating />
+                            <Text style={{ color: "white", marginVertical: 8 }}>獲取影片網址中</Text>
                         </View> :
                         <VideoPlayer
                             videoProps={{
@@ -154,11 +182,30 @@ export default class VideoScreen extends React.Component {
                             fadeOutDuration={200}
                             switchToLandscape={() => this.switchToLandscape()}
                             switchToPortrait={() => this.switchToPortrait()}
-                            showControlsOnLoad
                         />
                     }
-                    <Surface>
+                    <Surface style={styles.titleContainer}>
                         <Title>{videoList[playingIndex]?.title}</Title>
+                        <Caption>上架時間：{videoList[playingIndex]?.date}</Caption>
+                        <Divider />
+                        <View style={{ flex: 0, flexDirection: "row", justifyContent: "space-around" }}>
+                            <IconButton
+                                icon={this.animeId in this.state.favorites ? "heart" : "heart-outline"}
+                                onPress={() => this.toggleFavorite()}
+                                animated
+                            />
+
+                            <IconButton
+                                icon="share"
+                                onPress={() => Share.share({ message: videoList[playingIndex]?.url })}
+                                animated
+                            />
+                            <IconButton
+                                icon="open-in-new"
+                                onPress={() => IntentLauncher.startActivityAsync('android.intent.action.VIEW', { data: sourceUri })}
+                                animated
+                            />
+                        </View>
                     </Surface>
                     <FlatList
                         data={videoList}
@@ -176,16 +223,33 @@ export default class VideoScreen extends React.Component {
                                 {item.title.match(/\[[^\]]+\]/g).slice(-1)[0].slice(1, -1)}
                             </Button>
                         )}
+                        ListFooterComponent={() => (page && this.loadMoreEpisode())}
                     />
-                    {!!page &&
-                        <Button
-                            disabled={loadingList}
-                            loading={loadingList}
-                            onPress={() => this.fetchVideoList()}>
-                            {loadingList ? "載入中" : "載入更多集數"}
-                        </Button>}
                 </View>
             </View>
         );
     }
 }
+
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    button: {
+        width: "23%",
+        margin: 4,
+    },
+    videoPlaceholder: {
+        backgroundColor: "black",
+        flex: 0,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    titleContainer: {
+        paddingHorizontal: 8,
+        paddingTop: 4,
+        marginBottom: 8,
+        elevation: 2
+    },
+});

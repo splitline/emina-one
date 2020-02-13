@@ -25,7 +25,7 @@ class ListItem extends React.PureComponent {
         title={this.props.item.name}
         description={`${this.props.item.episode} / ${this.props.item.season}`}
         right={() => <List.Subheader>{this.props.item.fansub}</List.Subheader>}
-        onPress={() => { this.props.navigation.navigate("Video", { animeId: this.props.item.id }) }}
+        onPress={() => { this.props.navigation.navigate("Video", { animeId: this.props.item.id, animeData: this.props.item }) }}
       />
     );
   }
