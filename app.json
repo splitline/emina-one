@@ -25,6 +25,10 @@
     ],
     "ios": {
       "supportsTablet": true
+    },
+    "android": {
+      "package": "com.splitline.eminaone",
+      "versionCode": 1
     }
   }
 }

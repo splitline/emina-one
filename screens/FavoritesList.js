@@ -60,7 +60,7 @@ class FavoritesList extends React.Component {
     render() {
         const { favorites, refreshing } = this.state;
         return (
-            <SafeAreaView>
+            <SafeAreaView style={styles.container}>
                 <Appbar.Header>
                     <Appbar.Content title="所有動畫" />
                     <Appbar.Action icon="information-outline" onPress={() => { }} />
