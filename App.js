@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import AnimeList from './screens/AnimeList';
 import VideoScreen from './screens/VideoScreen';
+import FavoritesList from './screens/FavoritesList';
 
 const Tab = createMaterialBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -44,7 +45,7 @@ function Home({ navigation }) {
       />
       <Tab.Screen
         name="收藏的動畫"
-        component={HomeScreen}
+        component={FavoritesList}
         options={{
           tabBarIcon: 'heart',
         }}

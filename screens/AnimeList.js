@@ -8,14 +8,7 @@ import { List, Appbar, Searchbar } from 'react-native-paper';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  cellContainer: {
-    borderBottomWidth: 1,
-    borderColor: '#dcdcdc',
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 15
-  },
+  }
 });
 
 class ListItem extends React.PureComponent {
@@ -37,7 +30,7 @@ class AnimeList extends React.Component {
     this.navigation = this.props.navigation;
     this.state = {
       animeData: [],
-      refreshing: true
+      refreshing: false
     };
   }
 
