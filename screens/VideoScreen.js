@@ -93,10 +93,20 @@ export default class VideoScreen extends React.Component {
 
     fetchVideoList() {
         const { page } = this.state;
+        const url = `https://anime1.me/page/${page}?cat=${this.animeId}`;
         this.setState({ loadingList: true });
-        return fetch(`https://anime1.me/page/${page}/?cat=${this.animeId}`)
+        return fetch(url, { credentials: "include" })
             .then(r => r.text())
+            .then(html => html.includes("acpwd-pass") ?
+                fetch(url, {
+                    method: "POST",
+                    body: 'acpwd-pass=anime1.me',
+                    credentials: "include",
+                    headers: { 'Content-Type': "application/x-www-form-urlencoded" }
+                }).then(r => r.text()) :
+                html)
             .then(html => {
+                console.log(html)
                 if (html.includes("上一頁")) this.setState({ page: page + 1 });
                 else this.setState({ page: null });
                 const document = parse(html);
