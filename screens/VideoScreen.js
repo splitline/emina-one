@@ -3,7 +3,6 @@ import { Text, View, StyleSheet, StatusBar, BackHandler, FlatList, Dimensions } 
 import { parse } from 'node-html-parser';
 import { Title, Button, ActivityIndicator, Surface } from 'react-native-paper'
 
-import Player from '../components/Player';
 import { ScreenOrientation } from 'expo';
 import { Video } from 'expo-av';
 import VideoPlayer from 'expo-video-player';
@@ -24,8 +23,10 @@ export default class VideoScreen extends React.Component {
         this.animeId = this.props.route.params.animeId;
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => this.handleBackPress());
         this.state = {
+            loadingList: true,
             videoList: [],
             playingIndex: 0,
+            page: 1,
 
             loadingVideo: true,
             sourceUri: null,
@@ -36,19 +37,8 @@ export default class VideoScreen extends React.Component {
     }
 
     componentDidMount() {
-        fetch(`https://anime1.me/?cat=${this.animeId}`, { headers: { Cookie: "videopassword=1" }, credentials: "include" })
-            .then(r => r.text())
-            .then(html => {
-                const document = parse(html);
-                const result = document.querySelectorAll("article")
-                    .map(elem => ({
-                        title: elem.querySelector(".entry-title").text,
-                        url: elem.querySelector('iframe')?.getAttribute('src') || elem.querySelector('button')?.getAttribute('data-src')
-                    }))
-
-                this.setState({ videoList: result, playingIndex: 0 },
-                    () => this.fetchSourceUri(result[0].url));
-            });
+        this.fetchVideoList()
+            .then(result => this.fetchSourceUri(result[0].url));
     }
 
     handleBackPress() {
@@ -97,6 +87,26 @@ export default class VideoScreen extends React.Component {
             });
     }
 
+    fetchVideoList() {
+        const { page } = this.state;
+        this.setState({ loadingList: true });
+        return fetch(`https://anime1.me/page/${page}/?cat=${this.animeId}`, { headers: { Cookie: "videopassword=1" }, credentials: "include" })
+            .then(r => r.text())
+            .then(html => {
+                if (html.includes("上一頁")) this.setState({ page: page + 1 });
+                else this.setState({ page: null });
+                const document = parse(html);
+                const result = document.querySelectorAll("article")
+                    .map(elem => ({
+                        title: elem.querySelector(".entry-title").text,
+                        url: elem.querySelector('iframe')?.getAttribute('src') || elem.querySelector('button')?.getAttribute('data-src')
+                    }));
+
+                this.setState({ videoList: [...this.state.videoList, ...result], playingIndex: 0, loadingList: false });
+                return result;
+            });
+    }
+
     switchToLandscape() {
         ScreenOrientation.lockAsync(ScreenOrientation.Orientation.LANDSCAPE)
             .then(_ => this.setState({
@@ -117,7 +127,7 @@ export default class VideoScreen extends React.Component {
 
 
     render() {
-        const { videoList, playingIndex,
+        const { loadingList, videoList, playingIndex, page,
             loadingVideo, sourceUri, inFullscreen, pageHeight, pageWidth } = this.state;
         return (
             <View style={styles.container}>
@@ -126,9 +136,9 @@ export default class VideoScreen extends React.Component {
                     {loadingVideo ?
                         <View style={{
                             backgroundColor: "black",
-                            height: pageWidth / 16 * 9,
+                            height: pageWidth * 9 / 16,
                             width: pageWidth,
-                            flex: 1, justifyContent: 'center', alignItems: 'center'
+                            flex: 0, justifyContent: 'center', alignItems: 'center'
                         }}>
                             <ActivityIndicator animating />
                         </View> :
@@ -152,6 +162,7 @@ export default class VideoScreen extends React.Component {
                     </Surface>
                     <FlatList
                         data={videoList}
+                        style={{ flexGrow: 0 }}
                         numColumns={4}
                         columnWrapperStyle={{ flex: 1, alignContent: "stretch", justifyContent: "flex-start" }}
                         keyExtractor={(_, index) => index}
@@ -162,10 +173,17 @@ export default class VideoScreen extends React.Component {
                                         () => playingIndex !== index && this.fetchSourceUri(videoList[index].url))}
                                 mode={index === playingIndex ? "contained" : "outlined"}
                                 style={styles.button}>
-                                {item.title.match(/\[[^\]]+\]/g).slice(-1)[0].slice(1,-1)}
+                                {item.title.match(/\[[^\]]+\]/g).slice(-1)[0].slice(1, -1)}
                             </Button>
                         )}
                     />
+                    {!!page &&
+                        <Button
+                            disabled={loadingList}
+                            loading={loadingList}
+                            onPress={() => this.fetchVideoList()}>
+                            {loadingList ? "載入中" : "載入更多集數"}
+                        </Button>}
                 </View>
             </View>
         );

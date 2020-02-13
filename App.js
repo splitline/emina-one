@@ -57,7 +57,7 @@ function App() {
     <NavigationContainer>
       <Stack.Navigator headerMode="none">
         <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Video" component={VideoScreen} barStyle="#ff0000" />
+        <Stack.Screen name="Video" component={VideoScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
