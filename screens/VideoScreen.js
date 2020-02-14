@@ -7,7 +7,7 @@ import { ScreenOrientation } from 'expo';
 import { Video } from 'expo-av';
 import VideoPlayer from 'expo-video-player';
 import * as IntentLauncher from 'expo-intent-launcher';
-
+import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
 
 
 
@@ -34,6 +34,7 @@ export default class VideoScreen extends React.Component {
     }
 
     componentDidMount() {
+        activateKeepAwake();
         AsyncStorage.getItem("@EminaOne:favorites")
             .then(favorites => {
                 if (favorites !== null) {
@@ -50,6 +51,7 @@ export default class VideoScreen extends React.Component {
             this.switchToPortrait();
             return true;
         }
+        deactivateKeepAwake();
         return false;
     }
 
@@ -106,7 +108,6 @@ export default class VideoScreen extends React.Component {
                 }).then(r => r.text()) :
                 html)
             .then(html => {
-                console.log(html)
                 if (html.includes("上一頁")) this.setState({ page: page + 1 });
                 else this.setState({ page: null });
                 const document = parse(html);

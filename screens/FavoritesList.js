@@ -47,7 +47,6 @@ class FavoritesList extends React.Component {
                     favorites = JSON.parse(favorites);
                     this.setState({ favorites, refreshing: false })
                 }
-                console.log(favorites)
             });
     }
 
