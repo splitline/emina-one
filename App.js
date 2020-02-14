@@ -30,13 +30,6 @@ function Home({ navigation }) {
         navigation={navigation}
       />
       <Tab.Screen
-        name="近期更新"
-        component={HomeScreen}
-        options={{
-          tabBarIcon: 'update',
-        }}
-      />
-      <Tab.Screen
         name="新番時間表"
         component={HomeScreen}
         options={{

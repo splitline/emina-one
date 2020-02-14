@@ -39,9 +39,9 @@ class AnimeList extends React.Component {
     this.navigation = this.props.navigation;
     let { width } = Dimensions.get("window");
 
-    this._animeData = [];
+    this.animeDatas = [];
+
     this.state = {
-      animeData: [],
       refreshing: false,
       searchText: "",
 
@@ -63,7 +63,7 @@ class AnimeList extends React.Component {
         const result = document.querySelectorAll("#tablepress-1 tbody tr").map(elem => {
           const datas = elem.querySelectorAll("td");
           return {
-            id: datas[0].firstChild.getAttribute('href').split('=')[1],
+            id: +datas[0].firstChild.getAttribute('href').split('=')[1],
             name: datas[0].text,
             episode: datas[1].text,
             season: datas[2].text + datas[3].text,
@@ -71,8 +71,8 @@ class AnimeList extends React.Component {
             keyword: [datas[0].text, datas[1].text, datas[2].text + datas[3].text].join("|").toLowerCase()
           }
         })
-        this.setState({ animeData: result, refreshing: false, dataProvider: this.state.dataProvider.cloneWithRows(result) });
-        this._animeData = result;
+        this.setState({ refreshing: false, dataProvider: this.state.dataProvider.cloneWithRows(result) });
+        this.animeDatas = result;
       })
   }
 
@@ -86,24 +86,23 @@ class AnimeList extends React.Component {
       this.restoreList();
       return;
     }
-    this.setState({ searchText });
-    const animeData = this._animeData.filter(data => data.keyword.indexOf(searchText) > -1)
     this.setState({
-      animeData,
-      dataProvider: this.state.dataProvider.cloneWithRows(animeData)
+      searchText,
+      dataProvider: this.state.dataProvider.cloneWithRows(
+        this.animeDatas.filter(data => data.keyword.indexOf(searchText) > -1)
+      )
     });
   }
 
   restoreList() {
     this.setState({
       searchText: "",
-      animeData: this._animeData,
-      dataProvider: this.state.dataProvider.cloneWithRows(this._animeData)
+      dataProvider: this.state.dataProvider.cloneWithRows(this.animeDatas)
     });
   }
 
   render() {
-    const { refreshing, animeData } = this.state;
+    const { refreshing } = this.state;
     return (
       <SafeAreaView style={{ flex: 1 }}>
         {this.state.search ?
@@ -123,17 +122,19 @@ class AnimeList extends React.Component {
             <Appbar.Action icon="information-outline" onPress={() => { }} />
           </Appbar.Header>}
         <View>
-          <ScrollView style={{ padding: 5 }} horizontal>
+          <ScrollView horizontal>
             {["連載中", "劇場版", "OVA", "OAD", ...genSeasons()].map(
               (text, i) =>
                 <Chip
+                  key={i}
+                  style={{ margin: 3 }}
                   onPress={() => this.search(text)}
-                  selected={this.state.searchText === text.toLowerCase()} key={i}>
+                  selected={this.state.searchText === text.toLowerCase()}>
                   {text}
                 </Chip>)}
           </ScrollView>
         </View>
-        {animeData.length !== 0 ?
+        {this.state.dataProvider.getSize() !== 0 ?
           <RecyclerListView
             dataProvider={this.state.dataProvider}
             layoutProvider={this.state.layoutProvider}

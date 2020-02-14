@@ -77,6 +77,7 @@ export default class VideoScreen extends React.Component {
                         fetch("https://v.anime1.me/apiv2", {
                             method: "POST",
                             body: requestData,
+                            credentials: 'include',
                             headers: { 'Content-Type': "application/x-www-form-urlencoded" }
                         })
                             .then(r => r.json())
@@ -155,15 +156,6 @@ export default class VideoScreen extends React.Component {
             })
     }
 
-    loadMoreEpisode = () =>
-        (
-            <Button
-                disabled={this.state.loadingList}
-                loading={this.state.loadingList}
-                onPress={() => this.fetchVideoList()}>
-                {this.state.loadingList ? "載入章節列表中" : "載入更多集數"}
-            </Button>
-        )
 
     render() {
         const { loadingList, videoList, playingIndex, page,
@@ -234,7 +226,14 @@ export default class VideoScreen extends React.Component {
                                 {item.title.match(/\[[^\]]+\]/g).slice(-1)[0].slice(1, -1)}
                             </Button>
                         )}
-                        ListFooterComponent={() => (page && this.loadMoreEpisode())}
+                        ListFooterComponent={() => (page && (
+                            <Button
+                                disabled={loadingList}
+                                loading={loadingList}
+                                onPress={() => this.fetchVideoList()}>
+                                {loadingList ? "載入章節列表中" : "載入更多集數"}
+                            </Button>
+                        ))}
                     />
                 </View>
             </View>
