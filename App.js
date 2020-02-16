@@ -37,6 +37,13 @@ function Home({ navigation }) {
         }}
       />
       <Tab.Screen
+        name="觀看紀錄"
+        component={HomeScreen}
+        options={{
+          tabBarIcon: 'history',
+        }}
+      />
+      <Tab.Screen
         name="收藏的動畫"
         component={FavoritesList}
         options={{
@@ -49,9 +56,12 @@ function Home({ navigation }) {
 function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator headerMode="none">
+      <Stack.Navigator
+        headerMode="none"
+        // screenOptions={{ transitionSpec: {  } }}
+      >
         <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Video" component={VideoScreen}/>
+        <Stack.Screen name="Video" component={VideoScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

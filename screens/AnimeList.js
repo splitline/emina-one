@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Text, View, StyleSheet, ScrollView, SafeAreaView, RefreshControl, Dimensions } from 'react-native';
 import { parse } from 'node-html-parser';
 
-import { List, Appbar, Searchbar, Chip, IconButton } from 'react-native-paper';
+import { List, Appbar, Searchbar, Chip } from 'react-native-paper';
 import { RecyclerListView, DataProvider, LayoutProvider } from "recyclerlistview";
 
 
@@ -27,7 +27,7 @@ class ListItem extends React.PureComponent {
         title={this.props.item.name}
         description={`${this.props.item.episode} / ${this.props.item.season}`}
         right={() => <List.Subheader>{this.props.item.fansub}</List.Subheader>}
-        onPress={() => { this.props.navigation.navigate("Video", { animeId: this.props.item.id, animeData: this.props.item }) }}
+        onPress={() => this.props.navigation.navigate("Video", { animeId: this.props.item.id, animeData: this.props.item })}
       />
     );
   }
@@ -46,7 +46,7 @@ class AnimeList extends React.Component {
       searchText: "",
 
       dataProvider: new DataProvider((r1, r2) => r1.id !== r2.id),
-      layoutProvider: new LayoutProvider(() => 0, (_, dim) => (dim.width = width) && (dim.height = 64))
+      layoutProvider: new LayoutProvider(() => 0, (_, dim) => (dim.width = width) && (dim.height = 72))
     };
   }
 
@@ -89,7 +89,7 @@ class AnimeList extends React.Component {
     this.setState({
       searchText,
       dataProvider: this.state.dataProvider.cloneWithRows(
-        this.animeDatas.filter(data => data.keyword.indexOf(searchText) > -1)
+        this.animeDatas.filter(data => data.keyword.includes(searchText))
       )
     });
   }
@@ -127,7 +127,7 @@ class AnimeList extends React.Component {
               (text, i) =>
                 <Chip
                   key={i}
-                  style={{ margin: 3 }}
+                  style={{ marginHorizontal: 4, marginVertical: 8 }}
                   onPress={() => this.search(text)}
                   selected={this.state.searchText === text.toLowerCase()}>
                   {text}

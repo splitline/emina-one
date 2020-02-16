@@ -4,11 +4,9 @@ import { parse } from 'node-html-parser';
 import { Title, Button, ActivityIndicator, Surface, Divider, Caption, IconButton } from 'react-native-paper';
 
 import { ScreenOrientation } from 'expo';
-import { Video } from 'expo-av';
-import VideoPlayer from 'expo-video-player';
 import * as IntentLauncher from 'expo-intent-launcher';
 import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
-
+import AnimePlayer from "../components/AnimePlayer";
 
 
 export default class VideoScreen extends React.Component {
@@ -165,24 +163,13 @@ export default class VideoScreen extends React.Component {
                 <StatusBar hidden />
                 <View style={styles.container}>
                     {loadingVideo ?
-                        <View style={[
-                            styles.videoPlaceholder, {
-                                height: pageWidth * 9 / 16,
-                                width: pageWidth
-                            }]}>
+                        <View style={styles.videoPlaceholder}>
                             <ActivityIndicator animating />
                             <Text style={{ color: "white", marginVertical: 8 }}>獲取影片網址中</Text>
                         </View> :
-                        <VideoPlayer
-                            videoProps={{
-                                shouldPlay: true,
-                                resizeMode: Video.RESIZE_MODE_CONTAIN,
-                                source: { uri: sourceUri },
-                            }}
+                        <AnimePlayer
+                            sourceUri={sourceUri}
                             inFullscreen={inFullscreen}
-                            height={inFullscreen ? pageHeight : pageWidth * 9 / 16}
-                            width={pageWidth}
-                            fadeOutDuration={200}
                             switchToLandscape={() => this.switchToLandscape()}
                             switchToPortrait={() => this.switchToPortrait()}
                         />
@@ -254,7 +241,9 @@ const styles = StyleSheet.create({
         backgroundColor: "black",
         flex: 0,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        aspectRatio: 16 / 9,
+        width: '100%'
     },
     titleContainer: {
         paddingHorizontal: 8,
