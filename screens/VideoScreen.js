@@ -168,10 +168,12 @@ export default class VideoScreen extends React.Component {
                             <Text style={{ color: "white", marginVertical: 8 }}>獲取影片網址中</Text>
                         </View> :
                         <AnimePlayer
+                            title={videoList[playingIndex]?.title}
                             sourceUri={sourceUri}
                             inFullscreen={inFullscreen}
                             switchToLandscape={() => this.switchToLandscape()}
                             switchToPortrait={() => this.switchToPortrait()}
+                            goBack={() => this.props.navigation.goBack()}
                         />
                     }
                     <Surface style={styles.titleContainer}>
@@ -184,7 +186,6 @@ export default class VideoScreen extends React.Component {
                                 onPress={() => this.toggleFavorite()}
                                 animated
                             />
-
                             <IconButton
                                 icon="share"
                                 onPress={() => Share.share({ message: videoList[playingIndex]?.url })}

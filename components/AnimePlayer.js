@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View, Text, StyleSheet, TouchableWithoutFeedback, Slider, Animated } from 'react-native';
 import { Video } from 'expo-av';
-import { IconButton, ActivityIndicator } from "react-native-paper";
+import { IconButton, ActivityIndicator, Menu, Provider } from "react-native-paper";
 import { LinearGradient } from 'expo-linear-gradient';
 
 const millisToTime = ms => {
@@ -35,28 +35,28 @@ export default class AnimePlayer extends React.Component {
             isLoading: true,
 
             controlsOpacity: new Animated.Value(1),
-            ControlState: ControlStates.Shown
+            controlState: ControlStates.Shown
         }
     }
 
     hideControls(timing = 500) {
         this.controlsTimeout && clearTimeout(this.controlsTimeout);
-        this.setState({ ControlState: ControlStates.Hiding });
+        this.setState({ controlState: ControlStates.Hiding });
         Animated.timing(this.state.controlsOpacity, {
             toValue: 0,
             timing: timing
         }).start(
-            () => this.setState({ ControlState: ControlStates.Hidden })
+            () => this.setState({ controlState: ControlStates.Hidden })
         );
     }
 
     showControls() {
-        this.setState({ ControlState: ControlStates.Showing });
+        this.setState({ controlState: ControlStates.Showing });
         Animated.timing(this.state.controlsOpacity, {
             toValue: 1,
             timing: 200
         }).start(() => {
-            this.setState({ ControlState: ControlStates.Shown });
+            this.setState({ controlState: ControlStates.Shown });
             this.controlsTimeout = setTimeout(() => {
                 this.hideControls()
             }, 3000);
@@ -64,15 +64,15 @@ export default class AnimePlayer extends React.Component {
     }
 
     toggleControls() {
-        const { ControlState, controlsOpacity } = this.state;
-        if (ControlState === ControlStates.Shown) {
+        const { controlState, controlsOpacity } = this.state;
+        if (controlState === ControlStates.Shown) {
             this.hideControls(200);
-        } else if (ControlState === ControlStates.Showing) {
+        } else if (controlState === ControlStates.Showing) {
             Animated.timing(controlsOpacity).stop()
             this.hideControls(200);
-        } else if (ControlState === ControlStates.Hidden) {
+        } else if (controlState === ControlStates.Hidden) {
             this.showControls();
-        } else if (ControlState === ControlStates.Hiding) {
+        } else if (controlState === ControlStates.Hiding) {
             Animated.timing(controlsOpacity).stop()
             this.showControls();
         }
@@ -108,13 +108,24 @@ export default class AnimePlayer extends React.Component {
         inFullscreen ? this.props.switchToPortrait() : this.props.switchToLandscape();
     }
 
+    controlsEvent(callback, resetTimeout = true, ...args) {
+        if (this.controlsTimeout) {
+            clearTimeout(this.controlsTimeout);
+            if (resetTimeout)
+                this.controlsTimeout = setTimeout(() => {
+                    this.hideControls()
+                }, 3000);
+        }
+        callback(...args);
+    }
+
     static getDerivedStateFromProps(props) {
         return { inFullscreen: props.inFullscreen };
     }
 
     render() {
         const {
-            controlsOpacity, ControlState,
+            controlsOpacity, controlState,
             sourceUri, inFullscreen,
             seekingMillis, durationMillis, positionMillis, isPlaying, isLoading
         } = this.state;
@@ -140,8 +151,26 @@ export default class AnimePlayer extends React.Component {
                         <ActivityIndicator color="white" />
                     </View>}
                 <TouchableWithoutFeedback onPress={this.toggleControls.bind(this)}>
-                    {ControlState !== ControlStates.Hidden ?
+                    {controlState !== ControlStates.Hidden ?
                         <Animated.View style={[styles.controls, { opacity: controlsOpacity }]}>
+                            <View style={styles.topControls}>
+                                <LinearGradient
+                                    colors={['rgba(0,0,0,0.8)', 'transparent']}
+                                    style={{
+                                        position: 'absolute',
+                                        left: 0,
+                                        right: 0,
+                                        top: 0,
+                                        height: '150%'
+                                    }}
+                                />
+                                <IconButton
+                                    icon="keyboard-backspace"
+                                    size={30}
+                                    color="white"
+                                    onPress={inFullscreen ? this.props.switchToPortrait : this.props.goBack} />
+                                <Text style={{ color: 'white', flex: 1, fontSize: 18 }} numberOfLines={1}>{this.props.title}</Text>
+                            </View>
                             <View style={styles.bottomControls}>
                                 <LinearGradient
                                     colors={['transparent', 'rgba(0,0,0,0.8)']}
@@ -155,8 +184,8 @@ export default class AnimePlayer extends React.Component {
                                 />
                                 <Text style={{ color: 'white' }}>{millisToTime((typeof seekingMillis !== 'undefined') ? seekingMillis : positionMillis)} / {millisToTime(durationMillis)}</Text>
                                 <Slider
-                                    onValueChange={this.seekingPosition.bind(this)}
-                                    onSlidingComplete={this.seekingComplete.bind(this)}
+                                    onValueChange={value => this.controlsEvent(this.seekingPosition.bind(this), false, value)}
+                                    onSlidingComplete={value => this.controlsEvent(this.seekingComplete.bind(this), true, value)}
                                     maximumValue={durationMillis / 1000}
                                     step={1}
                                     value={(seekingMillis || positionMillis) / 1000}
@@ -166,7 +195,7 @@ export default class AnimePlayer extends React.Component {
                                     size={30}
                                     icon={inFullscreen ? "fullscreen-exit" : "fullscreen"}
                                     color="white"
-                                    onPress={this.handleFullscreen.bind(this)}
+                                    onPress={() => this.controlsEvent(() => this.handleFullscreen())}
                                 />
 
                             </View>
@@ -175,10 +204,10 @@ export default class AnimePlayer extends React.Component {
                                     icon={isPlaying ? "pause-circle" : "play-circle"}
                                     color="white"
                                     size={48}
-                                    onPress={() =>
+                                    onPress={() => this.controlsEvent(() =>
                                         isPlaying ?
                                             this.videoRef.current.pauseAsync() :
-                                            this.videoRef.current.playAsync()}
+                                            this.videoRef.current.playAsync())}
                                 />}
                         </Animated.View> :
                         <View style={styles.controls}></View>
@@ -206,5 +235,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center'
+    },
+    topControls: {
+        position: 'absolute',
+        top: 0,
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingRight: 16
     }
 });

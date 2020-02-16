@@ -56,10 +56,7 @@ function Home({ navigation }) {
 function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        headerMode="none"
-        // screenOptions={{ transitionSpec: {  } }}
-      >
+      <Stack.Navigator headerMode="none">
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Video" component={VideoScreen} />
       </Stack.Navigator>
