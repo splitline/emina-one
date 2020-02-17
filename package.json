@@ -30,7 +30,8 @@
     "react-native-web": "~0.11.7",
     "react-redux": "^7.1.3",
     "recyclerlistview": "^2.0.12",
-    "redux": "^4.0.5"
+    "redux": "^4.0.5",
+    "redux-persist": "^6.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
