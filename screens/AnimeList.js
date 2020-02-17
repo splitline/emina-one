@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, ScrollView, SafeAreaView, RefreshControl, Dimensions, KeyboardAvoidingView } from 'react-native';
+import { Text, View, StyleSheet, ScrollView, BackHandler, RefreshControl, Dimensions, KeyboardAvoidingView } from 'react-native';
 import { parse } from 'node-html-parser';
 
 import { List, Appbar, Searchbar, Chip } from 'react-native-paper';
@@ -8,7 +8,7 @@ import { RecyclerListView, DataProvider, LayoutProvider } from "recyclerlistview
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   }
 });
 
@@ -40,14 +40,25 @@ class AnimeList extends React.Component {
     let { width } = Dimensions.get("window");
 
     this.animeDatas = [];
+    this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => this.handleBackPress());
 
     this.state = {
       refreshing: false,
       searchText: "",
+      search: false,
 
       dataProvider: new DataProvider((r1, r2) => r1.id !== r2.id),
       layoutProvider: new LayoutProvider(() => 0, (_, dim) => (dim.width = width) && (dim.height = 72))
     };
+  }
+
+  handleBackPress() {
+    if(this.state.search) {
+      this.setState({search: false});
+      this.restoreList();
+      return true;
+    }
+    return false;
   }
 
   componentDidMount() {
@@ -104,7 +115,7 @@ class AnimeList extends React.Component {
   render() {
     const { refreshing } = this.state;
     return (
-      <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
+      <KeyboardAvoidingView style={styles.container} behavior="height" enabled>
         {this.state.search ?
           <Appbar.Header>
             <Searchbar
