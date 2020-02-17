@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, ScrollView, SafeAreaView, RefreshControl, Dimensions } from 'react-native';
+import { Text, View, StyleSheet, ScrollView, SafeAreaView, RefreshControl, Dimensions, KeyboardAvoidingView } from 'react-native';
 import { parse } from 'node-html-parser';
 
 import { List, Appbar, Searchbar, Chip } from 'react-native-paper';
@@ -104,7 +104,7 @@ class AnimeList extends React.Component {
   render() {
     const { refreshing } = this.state;
     return (
-      <SafeAreaView style={{ flex: 1 }}>
+      <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
         {this.state.search ?
           <Appbar.Header>
             <Searchbar
@@ -122,7 +122,7 @@ class AnimeList extends React.Component {
             <Appbar.Action icon="information-outline" onPress={() => { }} />
           </Appbar.Header>}
         <View>
-          <ScrollView horizontal>
+          <ScrollView keyboardShouldPersistTaps="always" horizontal>
             {["連載中", "劇場版", "OVA", "OAD", ...genSeasons()].map(
               (text, i) =>
                 <Chip
@@ -141,14 +141,15 @@ class AnimeList extends React.Component {
             rowRenderer={this.renderRow}
             style={{ flex: 1 }}
             scrollViewProps={{
-              refreshControl: <RefreshControl refreshing={refreshing} onRefresh={() => this.fetchData()} />
+              refreshControl: <RefreshControl refreshing={refreshing} onRefresh={() => this.fetchData()} />,
+              keyboardShouldPersistTaps: "always"
             }}
           /> :
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} >
             <Text>{refreshing ? "載入中" : "這裡什麼都沒有"}</Text>
           </View>
         }
-      </SafeAreaView>
+      </KeyboardAvoidingView>
     );
   }
 }

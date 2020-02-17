@@ -43,7 +43,7 @@ class FavoritesList extends React.Component {
         return (
             <SafeAreaView style={styles.container}>
                 <Appbar.Header>
-                    <Appbar.Content title="所有動畫" />
+                    <Appbar.Content title="收藏的動畫" />
                     <Appbar.Action icon="information-outline" onPress={() => { }} />
                 </Appbar.Header>
                 <FlatList
