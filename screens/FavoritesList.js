@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { Text, View, StyleSheet, FlatList, SafeAreaView, AsyncStorage, RefreshControl } from 'react-native';
-import { parse } from 'node-html-parser';
-
-import { List, Appbar, Searchbar } from 'react-native-paper';
+import { connect } from 'react-redux';
+import { List, Appbar } from 'react-native-paper';
 
 
 const styles = StyleSheet.create({
@@ -14,6 +13,7 @@ const styles = StyleSheet.create({
 class ListItem extends React.PureComponent {
     render() {
         const [id, data] = this.props.item;
+
         return (
             <List.Item
                 title={data.name}
@@ -29,26 +29,8 @@ class FavoritesList extends React.Component {
     constructor(props) {
         super(props);
         this.navigation = this.props.navigation;
-        this.state = {
-            favorites: [],
-            refreshing: false
-        };
     }
 
-    componentDidMount() {
-        this.fetchData();
-    }
-
-    fetchData() {
-        this.setState({ refreshing: true });
-        AsyncStorage.getItem("@EminaOne:favorites")
-            .then(favorites => {
-                if (favorites !== null) {
-                    favorites = JSON.parse(favorites);
-                    this.setState({ favorites, refreshing: false })
-                }
-            });
-    }
 
     renderRow = ({ item }) => {
         return (
@@ -57,7 +39,7 @@ class FavoritesList extends React.Component {
     }
 
     render() {
-        const { favorites, refreshing } = this.state;
+        const { favorites } = this.props;
         return (
             <SafeAreaView style={styles.container}>
                 <Appbar.Header>
@@ -65,14 +47,15 @@ class FavoritesList extends React.Component {
                     <Appbar.Action icon="information-outline" onPress={() => { }} />
                 </Appbar.Header>
                 <FlatList
-                    data={Object.entries(favorites)}
+                    data={favorites.idList.map(id => [id, favorites.byIds[id]])}
                     renderItem={this.renderRow}
-                    keyExtractor={item => item[0]}
-                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => this.fetchData()} />}
+                    keyExtractor={item => `${item[0]}`}
                 />
             </SafeAreaView>
         );
     }
 }
 
-export default FavoritesList;
+export default connect(
+    state => ({ favorites: state.favorites }),
+)(FavoritesList);

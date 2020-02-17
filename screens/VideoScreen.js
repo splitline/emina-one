@@ -2,21 +2,22 @@ import * as React from 'react';
 import { Text, View, StyleSheet, StatusBar, BackHandler, FlatList, Dimensions, Share, AsyncStorage } from 'react-native';
 import { parse } from 'node-html-parser';
 import { Title, Button, ActivityIndicator, Surface, Divider, Caption, IconButton } from 'react-native-paper';
+import { connect } from 'react-redux';
 
 import { ScreenOrientation } from 'expo';
 import * as IntentLauncher from 'expo-intent-launcher';
 import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
 import AnimePlayer from "../components/AnimePlayer";
+import { addFavorite, removeFavorite } from "../redux/actions";
 
-
-export default class VideoScreen extends React.Component {
+class VideoScreen extends React.Component {
     constructor(props) {
         super(props);
         this.animeId = this.props.route.params.animeId;
         this.animeData = this.props.route.params.animeData;
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => this.handleBackPress());
         this.state = {
-            favorites: {},
+            // favorites: {},
 
             loadingList: true,
             videoList: [],
@@ -33,13 +34,13 @@ export default class VideoScreen extends React.Component {
 
     componentDidMount() {
         activateKeepAwake();
-        AsyncStorage.getItem("@EminaOne:favorites")
-            .then(favorites => {
-                if (favorites !== null) {
-                    favorites = JSON.parse(favorites);
-                    this.setState({ favorites })
-                }
-            });
+        // AsyncStorage.getItem("@EminaOne:favorites")
+        //     .then(favorites => {
+        //         if (favorites !== null) {
+        //             favorites = JSON.parse(favorites);
+        //             this.setState({ favorites })
+        //         }
+        //     });
         this.fetchVideoList()
             .then(result => this.fetchSourceUri(result[0].url));
     }
@@ -141,23 +142,30 @@ export default class VideoScreen extends React.Component {
     }
 
     toggleFavorite() {
-        AsyncStorage.getItem("@EminaOne:favorites")
-            .then(result => {
-                let favorites = {};
-                if (result !== null)
-                    favorites = JSON.parse(result);
-                this.animeId in this.state.favorites ?
-                    delete favorites[this.animeId] :
-                    favorites[this.animeId] = this.animeData;
-                AsyncStorage.setItem("@EminaOne:favorites", JSON.stringify(favorites))
-                this.setState({ favorites })
-            })
+        const { favorites, addFavorite, removeFavorite } = this.props;
+
+        this.animeId in favorites.byIds ?
+            removeFavorite(this.animeId) :
+            addFavorite(this.animeId, this.animeData)
+
+        // AsyncStorage.getItem("@EminaOne:favorites")
+        //     .then(result => {
+        //         let favorites = {};
+        //         if (result !== null)
+        //             favorites = JSON.parse(result);
+        //         this.animeId in this.state.favorites ?
+        //             delete favorites[this.animeId] :
+        //             favorites[this.animeId] = this.animeData;
+        //         AsyncStorage.setItem("@EminaOne:favorites", JSON.stringify(favorites))
+        //         this.setState({ favorites })
+        //     })
     }
 
 
     render() {
         const { loadingList, videoList, playingIndex, page,
             loadingVideo, sourceUri, inFullscreen, pageHeight, pageWidth } = this.state;
+        const { favorites } = this.props;
         return (
             <View style={styles.container}>
                 <StatusBar hidden />
@@ -182,7 +190,7 @@ export default class VideoScreen extends React.Component {
                         <Divider />
                         <View style={{ flex: 0, flexDirection: "row", justifyContent: "space-around" }}>
                             <IconButton
-                                icon={this.animeId in this.state.favorites ? "heart" : "heart-outline"}
+                                icon={this.animeId in favorites.byIds ? "heart" : "heart-outline"}
                                 onPress={() => this.toggleFavorite()}
                                 animated
                             />
@@ -253,3 +261,8 @@ const styles = StyleSheet.create({
         elevation: 2
     },
 });
+
+export default connect(
+    state => ({ favorites: state.favorites }),
+    { addFavorite, removeFavorite }
+)(VideoScreen);
