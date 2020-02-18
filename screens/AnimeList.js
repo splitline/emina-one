@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, ScrollView, BackHandler, RefreshControl, Dimensions, KeyboardAvoidingView } from 'react-native';
+import { Text, View, StyleSheet, ScrollView, BackHandler, RefreshControl, Dimensions, KeyboardAvoidingView, SafeAreaView } from 'react-native';
 import { parse } from 'node-html-parser';
 
 import { List, Appbar, Searchbar, Chip } from 'react-native-paper';
 import { RecyclerListView, DataProvider, LayoutProvider } from "recyclerlistview";
-
+import FullscreenLoading from '../components/fullscreenLoading'
 
 const styles = StyleSheet.create({
   container: {
@@ -45,7 +45,7 @@ class AnimeList extends React.Component {
     this.state = {
       refreshing: false,
       searchText: "",
-      search: false,
+      searching: false,
 
       dataProvider: new DataProvider((r1, r2) => r1.id !== r2.id),
       layoutProvider: new LayoutProvider(() => 0, (_, dim) => (dim.width = width) && (dim.height = 72))
@@ -53,8 +53,8 @@ class AnimeList extends React.Component {
   }
 
   handleBackPress() {
-    if(this.state.search) {
-      this.setState({search: false});
+    if (this.state.searching) {
+      this.setState({ searching: false });
       this.restoreList();
       return true;
     }
@@ -113,10 +113,10 @@ class AnimeList extends React.Component {
   }
 
   render() {
-    const { refreshing } = this.state;
+    const { refreshing, searching } = this.state;
     return (
-      <KeyboardAvoidingView style={styles.container} behavior="height" enabled>
-        {this.state.search ?
+      <SafeAreaView style={styles.container}>
+        {searching ?
           <Appbar.Header>
             <Searchbar
               icon="keyboard-backspace"
@@ -124,12 +124,12 @@ class AnimeList extends React.Component {
               onChangeText={text => this.search(text)}
               onIconPress={() => {
                 this.restoreList();
-                this.setState({ search: !this.state.search });
+                this.setState({ searching: !searching });
               }} />
           </Appbar.Header> :
           <Appbar.Header>
             <Appbar.Content title="所有動畫" />
-            <Appbar.Action icon="magnify" onPress={() => this.setState({ search: !this.state.search })} />
+            <Appbar.Action icon="magnify" onPress={() => this.setState({ searching: !searching })} />
             <Appbar.Action icon="information-outline" onPress={() => { }} />
           </Appbar.Header>}
         <View>
@@ -152,15 +152,18 @@ class AnimeList extends React.Component {
             rowRenderer={this.renderRow}
             style={{ flex: 1 }}
             scrollViewProps={{
-              refreshControl: <RefreshControl refreshing={refreshing} onRefresh={() => this.fetchData()} />,
+              refreshControl: !searching && <RefreshControl refreshing={refreshing} onRefresh={() => this.fetchData()} />,
               keyboardShouldPersistTaps: "always"
             }}
           /> :
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} >
-            <Text>{refreshing ? "載入中" : "這裡什麼都沒有"}</Text>
-          </View>
+          refreshing ?
+            <FullscreenLoading /> :
+            <View style={{ flex: 1, paddingTop: 24, alignItems: 'center' }} >
+              <Text>這裡什麼都沒有 (´；ω；｀)</Text>
+            </View>
+
         }
-      </KeyboardAvoidingView>
+      </SafeAreaView>
     );
   }
 }

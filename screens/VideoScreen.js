@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, StatusBar, BackHandler, FlatList, Dimensions, Share, AsyncStorage } from 'react-native';
+import { Text, View, StyleSheet, StatusBar, BackHandler, FlatList, Dimensions, Share } from 'react-native';
 import { parse } from 'node-html-parser';
 import { Title, Button, ActivityIndicator, Surface, Divider, Caption, IconButton } from 'react-native-paper';
 import { connect } from 'react-redux';
@@ -17,8 +17,6 @@ class VideoScreen extends React.Component {
         this.animeData = this.props.route.params.animeData;
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => this.handleBackPress());
         this.state = {
-            // favorites: {},
-
             loadingList: true,
             videoList: [],
             playingIndex: 0,
@@ -34,13 +32,6 @@ class VideoScreen extends React.Component {
 
     componentDidMount() {
         activateKeepAwake();
-        // AsyncStorage.getItem("@EminaOne:favorites")
-        //     .then(favorites => {
-        //         if (favorites !== null) {
-        //             favorites = JSON.parse(favorites);
-        //             this.setState({ favorites })
-        //         }
-        //     });
         this.fetchVideoList()
             .then(result => this.fetchSourceUri(result[0].url));
     }
@@ -147,18 +138,6 @@ class VideoScreen extends React.Component {
         this.animeId in favorites.byIds ?
             removeFavorite(this.animeId) :
             addFavorite(this.animeId, this.animeData)
-
-        // AsyncStorage.getItem("@EminaOne:favorites")
-        //     .then(result => {
-        //         let favorites = {};
-        //         if (result !== null)
-        //             favorites = JSON.parse(result);
-        //         this.animeId in this.state.favorites ?
-        //             delete favorites[this.animeId] :
-        //             favorites[this.animeId] = this.animeData;
-        //         AsyncStorage.setItem("@EminaOne:favorites", JSON.stringify(favorites))
-        //         this.setState({ favorites })
-        //     })
     }
 
 

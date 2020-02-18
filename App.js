@@ -19,26 +19,28 @@ const Stack = createStackNavigator();
 function HomeScreen() {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Home!</Text>
+      <Text>建置中 _(:з」∠)_</Text>
     </View>
   );
 }
 
 function Home({ navigation }) {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator backBehavior="initialRoute" initialRouteName="animeList">
       <Tab.Screen
-        name="動畫列表"
+        name="animeList"
         component={AnimeList}
         options={{
+          title: "動畫列表",
           tabBarIcon: 'view-list',
         }}
         navigation={navigation}
       />
       <Tab.Screen
-        name="新番時間表"
+        name="animeCalendar"
         component={HomeScreen}
         options={{
+          title: "新番時間表",
           tabBarIcon: 'calendar',
         }}
       />
@@ -50,9 +52,10 @@ function Home({ navigation }) {
         }}
       />
       <Tab.Screen
-        name="收藏的動畫"
+        name="FavoritesList"
         component={FavoritesList}
         options={{
+          title:"收藏的動畫",
           tabBarIcon: 'heart',
         }}
       />
