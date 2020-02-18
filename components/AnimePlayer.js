@@ -199,6 +199,24 @@ export default class AnimePlayer extends React.Component {
                                 />
 
                             </View>
+                            <View style={styles.rwdfwdControls}>
+                                <IconButton
+                                    icon="rewind-10"
+                                    color="white"
+                                    size={48}
+                                    onPress={() => this.controlsEvent(() =>
+                                        this.videoRef.current.setPositionAsync(Math.max(positionMillis - 10000, 0))
+                                    )}
+                                />
+                                <IconButton
+                                    icon="fast-forward-10"
+                                    color="white"
+                                    size={48}
+                                    onPress={() => this.controlsEvent(() =>
+                                        this.videoRef.current.setPositionAsync(Math.min(positionMillis + 10000, durationMillis))
+                                    )}
+                                />
+                            </View>
                             {!isLoading &&
                                 <IconButton
                                     icon={isPlaying ? "pause-circle" : "play-circle"}
@@ -225,7 +243,8 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        flexDirection: 'row'
     },
     bottomControls: {
         position: 'absolute',
@@ -244,5 +263,13 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingRight: 16
+    },
+    rwdfwdControls: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        flexDirection: 'row'
     }
 });
