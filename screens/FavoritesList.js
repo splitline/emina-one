@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, FlatList, SafeAreaView, AsyncStorage, RefreshControl } from 'react-native';
+import { Text, View, StyleSheet, FlatList, SafeAreaView } from 'react-native';
 import { connect } from 'react-redux';
 import { List, Appbar } from 'react-native-paper';
+import AnimeEntry from "../components/AnimeEntry";
 
 
 const styles = StyleSheet.create({
@@ -9,21 +10,6 @@ const styles = StyleSheet.create({
         flex: 1
     },
 });
-
-class ListItem extends React.PureComponent {
-    render() {
-        const [id, data] = this.props.item;
-
-        return (
-            <List.Item
-                title={data.name}
-                description={data.season}
-                right={() => <List.Subheader>{data.fansub}</List.Subheader>}
-                onPress={() => { this.props.navigation.navigate("Video", { animeId: id, animeData: data }) }}
-            />
-        );
-    }
-}
 
 class FavoritesList extends React.Component {
     constructor(props) {
@@ -33,8 +19,9 @@ class FavoritesList extends React.Component {
 
 
     renderRow = ({ item }) => {
+        const {animeDatas} = this.props;
         return (
-            <ListItem item={item} navigation={this.navigation} />
+            <AnimeEntry {...animeDatas[item]} navigation={this.navigation} />
         )
     }
 
@@ -47,15 +34,16 @@ class FavoritesList extends React.Component {
                     <Appbar.Action icon="information-outline" onPress={() => { }} />
                 </Appbar.Header>
                 <FlatList
-                    data={favorites.idList.map(id => [id, favorites.byIds[id]])}
+                    data={favorites.idList}
                     renderItem={this.renderRow}
-                    keyExtractor={item => `${item[0]}`}
+                    keyExtractor={item => `${item}`}
                 />
             </SafeAreaView>
         );
     }
 }
 
-export default connect(
-    state => ({ favorites: state.favorites }),
-)(FavoritesList);
+export default connect(state => ({
+    favorites: state.favorites,
+    animeDatas: state.animeDatas
+}))(FavoritesList);

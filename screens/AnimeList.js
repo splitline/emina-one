@@ -1,30 +1,20 @@
 import * as React from 'react';
 import { Text, View, StyleSheet, ScrollView, BackHandler, RefreshControl, Dimensions, KeyboardAvoidingView, SafeAreaView } from 'react-native';
 import { parse } from 'node-html-parser';
-
+import { connect } from 'react-redux';
 import { List, Appbar, Searchbar, Chip } from 'react-native-paper';
 import { RecyclerListView, DataProvider, LayoutProvider } from "recyclerlistview";
+
+import AnimeEntry from "../components/AnimeEntry";
 import FullscreenLoading from '../components/fullscreenLoading'
 import { getPastSeasons } from "../utils/anime-season";
+import { setAnimeDatas } from "../redux/actions";
 
 const styles = StyleSheet.create({
   container: {
     flex: 1
   }
 });
-
-class ListItem extends React.PureComponent {
-  render() {
-    return (
-      <List.Item
-        title={this.props.item.name}
-        description={`${this.props.item.episode} / ${this.props.item.season}`}
-        right={() => <List.Subheader>{this.props.item.fansub}</List.Subheader>}
-        onPress={() => this.props.navigation.navigate("Video", { animeId: this.props.item.id, animeData: this.props.item })}
-      />
-    );
-  }
-}
 
 class AnimeList extends React.Component {
   constructor(props) {
@@ -59,6 +49,7 @@ class AnimeList extends React.Component {
   }
 
   fetchData() {
+    const { setAnimeDatas } = this.props;
     this.setState({ refreshing: true });
     fetch('https://anime1.me/')
       .then(r => r.text())
@@ -68,20 +59,21 @@ class AnimeList extends React.Component {
           const datas = elem.querySelectorAll("td");
           return {
             id: +datas[0].firstChild.getAttribute('href').split('=')[1],
-            name: datas[0].text,
+            title: datas[0].text,
             episode: datas[1].text,
             season: datas[2].text + datas[3].text,
             fansub: datas[4].text.trim() !== "-" ? datas[4].text : "",
             keyword: [datas[0].text, datas[1].text, datas[2].text + datas[3].text].join("|").toLowerCase()
-          }
-        })
+          };
+        });
         this.setState({ refreshing: false, dataProvider: this.state.dataProvider.cloneWithRows(result) });
         this.animeDatas = result;
+        setAnimeDatas(result);
       })
   }
 
   renderRow = (_, item) => (
-    <ListItem item={item} navigation={this.navigation} />
+    <AnimeEntry {...item} navigation={this.navigation} />
   )
 
   search(searchText) {
@@ -161,4 +153,7 @@ class AnimeList extends React.Component {
   }
 }
 
-export default AnimeList;
+export default connect(
+  state => ({ animeDatas: state.animeDatas }),
+  { setAnimeDatas }
+)(AnimeList);

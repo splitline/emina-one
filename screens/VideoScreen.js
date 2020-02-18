@@ -14,7 +14,6 @@ class VideoScreen extends React.Component {
     constructor(props) {
         super(props);
         this.animeId = this.props.route.params.animeId;
-        this.animeData = this.props.route.params.animeData;
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => this.handleBackPress());
         this.state = {
             loadingList: true,
@@ -137,7 +136,9 @@ class VideoScreen extends React.Component {
 
         this.animeId in favorites.byIds ?
             removeFavorite(this.animeId) :
-            addFavorite(this.animeId, this.animeData)
+            addFavorite(this.animeId, {
+                addedDate: new Date()
+            })
     }
 
 
