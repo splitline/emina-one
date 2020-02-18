@@ -7,6 +7,7 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 
 import AnimeList from './screens/AnimeList';
 import VideoScreen from './screens/VideoScreen';
+import AnimeCalendar from './screens/AnimeCalendar';
 import FavoritesList from './screens/FavoritesList';
 import Loading from "./components/fullscreenLoading";
 
@@ -37,8 +38,8 @@ function Home({ navigation }) {
         navigation={navigation}
       />
       <Tab.Screen
-        name="animeCalendar"
-        component={HomeScreen}
+        name="AnimeCalendar"
+        component={AnimeCalendar}
         options={{
           title: "新番時間表",
           tabBarIcon: 'calendar',

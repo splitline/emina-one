@@ -199,24 +199,26 @@ export default class AnimePlayer extends React.Component {
                                 />
 
                             </View>
-                            <View style={styles.rwdfwdControls}>
-                                <IconButton
-                                    icon="rewind-10"
-                                    color="white"
-                                    size={48}
-                                    onPress={() => this.controlsEvent(() =>
-                                        this.videoRef.current.setPositionAsync(Math.max(positionMillis - 10000, 0))
-                                    )}
-                                />
-                                <IconButton
-                                    icon="fast-forward-10"
-                                    color="white"
-                                    size={48}
-                                    onPress={() => this.controlsEvent(() =>
-                                        this.videoRef.current.setPositionAsync(Math.min(positionMillis + 10000, durationMillis))
-                                    )}
-                                />
-                            </View>
+                            {inFullscreen &&
+                                <View style={styles.rwdfwdControls}>
+                                    <IconButton
+                                        icon="rewind-10"
+                                        color="white"
+                                        size={48}
+                                        onPress={() => this.controlsEvent(() =>
+                                            this.videoRef.current.setPositionAsync(Math.max(positionMillis - 10000, 0))
+                                        )}
+                                    />
+                                    <IconButton
+                                        icon="fast-forward-10"
+                                        color="white"
+                                        size={48}
+                                        onPress={() => this.controlsEvent(() =>
+                                            this.videoRef.current.setPositionAsync(Math.min(positionMillis + 10000, durationMillis))
+                                        )}
+                                    />
+                                </View>}
+
                             {!isLoading &&
                                 <IconButton
                                     icon={isPlaying ? "pause-circle" : "play-circle"}

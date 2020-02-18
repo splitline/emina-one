@@ -5,20 +5,13 @@ import { parse } from 'node-html-parser';
 import { List, Appbar, Searchbar, Chip } from 'react-native-paper';
 import { RecyclerListView, DataProvider, LayoutProvider } from "recyclerlistview";
 import FullscreenLoading from '../components/fullscreenLoading'
+import { getPastSeasons } from "../utils/anime-season";
 
 const styles = StyleSheet.create({
   container: {
     flex: 1
   }
 });
-
-const genSeasons = () =>
-  Array(4).fill(0)
-    .map((_, i) => {
-      const date = new Date();
-      return new Date(date.setMonth(date.getMonth() - 3 * i))
-    })
-    .map(d => d.getFullYear() + ["冬", "春", "夏", "秋"][Math.floor(d.getMonth() / 3)]);
 
 class ListItem extends React.PureComponent {
   render() {
@@ -134,7 +127,7 @@ class AnimeList extends React.Component {
           </Appbar.Header>}
         <View>
           <ScrollView keyboardShouldPersistTaps="always" horizontal>
-            {["連載中", "劇場版", "OVA", "OAD", ...genSeasons()].map(
+            {["連載中", "劇場版", "OVA", "OAD", ...getPastSeasons()].map(
               (text, i) =>
                 <Chip
                   key={i}
