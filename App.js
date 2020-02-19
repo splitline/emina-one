@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 
 import AnimeList from './screens/AnimeList';
 import VideoScreen from './screens/VideoScreen';
@@ -13,6 +14,14 @@ import Loading from "./components/fullscreenLoading";
 
 import { store, persistor } from "./redux/store";
 import { PersistGate } from 'redux-persist/integration/react';
+
+const theme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: '#e4017e' // from anime.me icon
+  },
+};
 
 const Tab = createMaterialBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -27,7 +36,12 @@ function HomeScreen() {
 
 function Home({ navigation }) {
   return (
-    <Tab.Navigator backBehavior="initialRoute" initialRouteName="animeList">
+    <Tab.Navigator
+      backBehavior="initialRoute"
+      initialRouteName="animeList"
+      activeColor={theme.colors.primary}
+      barStyle={{ backgroundColor: theme.colors.surface, elevation: 8 }}
+    >
       <Tab.Screen
         name="animeList"
         component={AnimeList}
@@ -56,8 +70,8 @@ function Home({ navigation }) {
         name="FavoritesList"
         component={FavoritesList}
         options={{
-          title:"收藏的動畫",
-          tabBarIcon: 'heart',
+          title: "收藏的動畫",
+          tabBarIcon: 'heart'
         }}
       />
     </Tab.Navigator>);
@@ -77,6 +91,8 @@ function App() {
 export default () =>
   <Provider store={store}>
     <PersistGate loading={<Loading />} persistor={persistor}>
-      <App />
+      <PaperProvider theme={theme}>
+        <App />
+      </PaperProvider>
     </PersistGate>
   </Provider>;

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Text, View, StyleSheet, StatusBar, BackHandler, FlatList, Dimensions, Share } from 'react-native';
 import { parse } from 'node-html-parser';
-import { Title, Button, ActivityIndicator, Surface, Divider, Caption, IconButton } from 'react-native-paper';
+import { Title, Button, ActivityIndicator, Surface, Divider, Caption, IconButton, withTheme } from 'react-native-paper';
 import { connect } from 'react-redux';
 
 import { ScreenOrientation } from 'expo';
@@ -146,6 +146,7 @@ class VideoScreen extends React.Component {
         const { loadingList, videoList, playingIndex, page,
             loadingVideo, sourceUri, inFullscreen, pageHeight, pageWidth } = this.state;
         const { favorites } = this.props;
+        const isFavorite = this.animeId in favorites.byIds 
         return (
             <View style={styles.container}>
                 <StatusBar hidden />
@@ -170,16 +171,19 @@ class VideoScreen extends React.Component {
                         <Divider />
                         <View style={{ flex: 0, flexDirection: "row", justifyContent: "space-around" }}>
                             <IconButton
-                                icon={this.animeId in favorites.byIds ? "heart" : "heart-outline"}
+                                color={isFavorite? this.props.theme.colors.primary: '#757575'}
+                                icon={isFavorite ? "heart" : "heart-outline"}
                                 onPress={() => this.toggleFavorite()}
                                 animated
                             />
                             <IconButton
+                                color="#757575"
                                 icon="share"
                                 onPress={() => Share.share({ message: videoList[playingIndex]?.url })}
                                 animated
                             />
                             <IconButton
+                                color="#757575"
                                 icon="open-in-new"
                                 onPress={() => IntentLauncher.startActivityAsync('android.intent.action.VIEW', { data: sourceUri })}
                                 animated
@@ -245,4 +249,4 @@ const styles = StyleSheet.create({
 export default connect(
     state => ({ favorites: state.favorites }),
     { addFavorite, removeFavorite }
-)(VideoScreen);
+)(withTheme(VideoScreen));
