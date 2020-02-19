@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 
 import AnimeEntry from "../components/AnimeEntry";
 import { getCurrentSeason } from "../utils/anime-season";
+import FullscreenLoading from "../components/fullscreenLoading";
 
 const AnimeCalendar = ({ navigation, animeDatas, theme }) => {
     const [calendar, setCalendar] = useState([]);
@@ -60,21 +61,22 @@ const AnimeCalendar = ({ navigation, animeDatas, theme }) => {
                     />}
             >
                 {["日", "一", "二", "三", "四", "五", "六"].map((day, i) =>
-                    <FlatList
-                        key={i}
-                        tabLabel={day}
-                        data={calendar[i]}
-                        keyExtractor={item => `${item.id}`}
-                        renderItem={({ item }) =>
-                            <AnimeEntry
-                                navigation={navigation}
-                                {...{
-                                    id: item.id,
-                                    title: item.title,
-                                    ...animeDatas[item.id]
-                                }}
-                            />}
-                    />
+                    calendar[i] ?
+                        (<FlatList
+                            key={i}
+                            tabLabel={day}
+                            data={calendar[i]}
+                            keyExtractor={item => `${item.id}`}
+                            renderItem={({ item }) =>
+                                <AnimeEntry
+                                    navigation={navigation}
+                                    {...{
+                                        id: item.id,
+                                        title: item.title,
+                                        ...animeDatas[item.id]
+                                    }}
+                                />}
+                        />) : (<FullscreenLoading tabLabel={day} key={i}/>)
                 )}
             </ScrollableTabView>
         </View>
