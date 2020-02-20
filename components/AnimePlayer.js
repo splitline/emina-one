@@ -1,8 +1,10 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, TouchableWithoutFeedback, Slider, Animated } from 'react-native';
-import { Video } from 'expo-av';
-import { IconButton, ActivityIndicator, Menu, Provider } from "react-native-paper";
+import { View, Text, StyleSheet, TouchableWithoutFeedback, Slider, Animated, FlatList } from 'react-native';
+import { Video, Audio } from 'expo-av';
+import { Button, IconButton, ActivityIndicator, List } from "react-native-paper";
 import { LinearGradient } from 'expo-linear-gradient';
+import ActionSheet from 'react-native-actions-sheet';
+// import BottomSheet from "react-native-raw-bottom-sheet";
 
 const millisToTime = ms => {
     const totalSeconds = ms / 1000;
@@ -22,11 +24,13 @@ export default class AnimePlayer extends React.Component {
     constructor(props) {
         super(props);
         this.videoRef = React.createRef();
+        this.actionSheetRef = React.createRef();
         this.controlsTimeout = null;
         this.state = {
             sourceUri: this.props.sourceUri,
             inFullscreen: this.props.inFullscreen,
 
+            playbackRate: 1.0,
             seekingMillis: undefined,
             durationMillis: 0,
             positionMillis: 0,
@@ -109,13 +113,12 @@ export default class AnimePlayer extends React.Component {
     }
 
     controlsEvent(callback, resetTimeout = true, ...args) {
-        if (this.controlsTimeout) {
+        if (this.controlsTimeout)
             clearTimeout(this.controlsTimeout);
-            if (resetTimeout)
-                this.controlsTimeout = setTimeout(() => {
-                    this.hideControls()
-                }, 3000);
-        }
+        if (resetTimeout)
+            this.controlsTimeout = setTimeout(() => {
+                this.hideControls()
+            }, 3000);
         callback(...args);
     }
 
@@ -127,13 +130,14 @@ export default class AnimePlayer extends React.Component {
         const {
             controlsOpacity, controlState,
             sourceUri, inFullscreen,
+            playbackRate,
             seekingMillis, durationMillis, positionMillis, isPlaying, isLoading
         } = this.state;
 
         return (
             <View>
                 <Video
-                    shouldPlay
+                    shouldPlay={false}
                     ref={this.videoRef}
                     resizeMode={Video.RESIZE_MODE_CONTAIN}
                     onLoad={this.loaded.bind(this)}
@@ -170,6 +174,20 @@ export default class AnimePlayer extends React.Component {
                                     color="white"
                                     onPress={inFullscreen ? this.props.switchToPortrait : this.props.goBack} />
                                 <Text style={{ color: 'white', flex: 1, fontSize: 18 }} numberOfLines={1}>{this.props.title}</Text>
+                                {inFullscreen &&
+                                    <Button
+                                        theme={{ roundness: 12 }}
+                                        compact
+                                        onPress={() => { }}
+                                        color="white"
+                                        onPress={() => this.controlsEvent(
+                                            () => this.actionSheetRef.current.setModalVisible(), false
+                                        )}
+                                        uppercase={false}
+                                    >
+                                        {playbackRate}x
+                                    </Button>
+                                }
                             </View>
                             <View style={styles.bottomControls}>
                                 <LinearGradient
@@ -229,11 +247,32 @@ export default class AnimePlayer extends React.Component {
                                             this.videoRef.current.pauseAsync() :
                                             this.videoRef.current.playAsync())}
                                 />}
+                            <ActionSheet
+                                gestureEnabled
+                                initialOffsetFromBottom={0.5}
+                                ref={this.actionSheetRef}
+                                onClose={() => this.controlsEvent(() => { }, true)}
+                            >
+                                <View style={{ height: '100%' }}>
+                                    {[0.5, 0.75, 1.0, 1.25, 1.5, 2.0].map((speed, i) =>
+                                        <List.Item
+                                            key={i}
+                                            title={`${speed} 倍`}
+                                            left={() => <List.Icon icon={playbackRate === speed && "check"} style={{ marginVertical: 0 }} />}
+                                            onPress={() => this.controlsEvent(() => {
+                                                this.videoRef.current.setRateAsync(speed, true, Audio.PitchCorrectionQuality.High);
+                                                this.actionSheetRef.current.setModalVisible();
+                                                this.setState({ playbackRate: speed });
+                                            })}
+                                        />
+                                    )}
+                                </View>
+                            </ActionSheet>
                         </Animated.View> :
-                        <View style={styles.controls}></View>
+                        <View style={styles.controls}></View> // empty :)
                     }
                 </TouchableWithoutFeedback>
-            </View >
+            </View>
         );
     }
 };
