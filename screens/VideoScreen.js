@@ -105,7 +105,8 @@ class VideoScreen extends React.Component {
                     .map(elem => ({
                         title: elem.querySelector(".entry-title").text,
                         date: elem.querySelector('time').text,
-                        url: elem.querySelector('iframe')?.getAttribute('src') || elem.querySelector('button')?.getAttribute('data-src')
+                        url: elem.querySelector('iframe')?.getAttribute('src') || elem.querySelector('button')?.getAttribute('data-src'),
+                        pageURL: `https://anime1.me/${elem.getAttribute('id').split('-')[1]}`
                     }));
 
                 this.setState({ videoList: [...this.state.videoList, ...result], playingIndex: 0, loadingList: false });
@@ -146,7 +147,7 @@ class VideoScreen extends React.Component {
         const { loadingList, videoList, playingIndex, page,
             loadingVideo, sourceUri, inFullscreen, pageHeight, pageWidth } = this.state;
         const { favorites } = this.props;
-        const isFavorite = this.animeId in favorites.byIds 
+        const isFavorite = this.animeId in favorites.byIds
         return (
             <View style={styles.container}>
                 <StatusBar hidden />
@@ -171,7 +172,7 @@ class VideoScreen extends React.Component {
                         <Divider />
                         <View style={{ flex: 0, flexDirection: "row", justifyContent: "space-around" }}>
                             <IconButton
-                                color={isFavorite? this.props.theme.colors.primary: '#757575'}
+                                color={isFavorite ? this.props.theme.colors.primary : '#757575'}
                                 icon={isFavorite ? "heart" : "heart-outline"}
                                 onPress={() => this.toggleFavorite()}
                                 animated
@@ -179,7 +180,7 @@ class VideoScreen extends React.Component {
                             <IconButton
                                 color="#757575"
                                 icon="share"
-                                onPress={() => Share.share({ message: videoList[playingIndex]?.url })}
+                                onPress={() => Share.share({ message: videoList[playingIndex]?.title + "\n" + videoList[playingIndex]?.pageURL })}
                                 animated
                             />
                             <IconButton
