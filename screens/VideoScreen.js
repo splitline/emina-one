@@ -165,19 +165,16 @@ class VideoScreen extends React.Component {
                                 color={isFavorite ? this.props.theme.colors.primary : '#757575'}
                                 icon={isFavorite ? "heart" : "heart-outline"}
                                 onPress={() => this.toggleFavorite()}
-                                animated
                             />
                             <IconButton
                                 color="#757575"
                                 icon="share"
                                 onPress={() => Share.share({ message: videoList[playingIndex]?.title + "\n" + videoList[playingIndex]?.pageURL })}
-                                animated
                             />
                             <IconButton
                                 color="#757575"
                                 icon="open-in-new"
                                 onPress={() => IntentLauncher.startActivityAsync('android.intent.action.VIEW', { data: sourceUri })}
-                                animated
                             />
                         </View>
                     </Surface>
