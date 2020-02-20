@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Text, View, StyleSheet, FlatList, SafeAreaView } from 'react-native';
 import { connect } from 'react-redux';
-import { List, Appbar } from 'react-native-paper';
+import { Appbar } from 'react-native-paper';
 import AnimeEntry from "../components/AnimeEntry";
 
 
@@ -19,7 +19,7 @@ class FavoritesList extends React.Component {
 
 
     renderRow = ({ item }) => {
-        const {animeDatas} = this.props;
+        const { animeDatas } = this.props;
         return (
             <AnimeEntry {...animeDatas[item]} navigation={this.navigation} />
         )
@@ -33,11 +33,16 @@ class FavoritesList extends React.Component {
                     <Appbar.Content title="收藏的動畫" />
                     <Appbar.Action icon="information-outline" onPress={() => { }} />
                 </Appbar.Header>
-                <FlatList
-                    data={favorites.idList}
-                    renderItem={this.renderRow}
-                    keyExtractor={item => `${item}`}
-                />
+                {favorites.idList.length === 0 ?
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <Text>該去收藏點東西了吧</Text>
+                    </View> :
+                    <FlatList
+                        data={favorites.idList}
+                        renderItem={this.renderRow}
+                        keyExtractor={item => `${item}`}
+                    />
+                }
             </SafeAreaView>
         );
     }

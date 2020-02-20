@@ -4,7 +4,6 @@ import { Video, Audio } from 'expo-av';
 import { Button, IconButton, ActivityIndicator, List } from "react-native-paper";
 import { LinearGradient } from 'expo-linear-gradient';
 import ActionSheet from 'react-native-actions-sheet';
-// import BottomSheet from "react-native-raw-bottom-sheet";
 
 const millisToTime = ms => {
     const totalSeconds = ms / 1000;
