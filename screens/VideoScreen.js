@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, StatusBar, BackHandler, FlatList, Dimensions, Share } from 'react-native';
+import { Text, View, StyleSheet, StatusBar, BackHandler, FlatList, Share } from 'react-native';
 import { parse } from 'node-html-parser';
 import { Title, Button, ActivityIndicator, Surface, Divider, Caption, IconButton, withTheme } from 'react-native-paper';
 import { connect } from 'react-redux';
@@ -24,8 +24,6 @@ class VideoScreen extends React.Component {
             loadingVideo: true,
             sourceUri: null,
             inFullscreen: false,
-            pageHeight: Dimensions.get('window').height,
-            pageWidth: Dimensions.get('window').width
         };
     }
 
@@ -116,20 +114,12 @@ class VideoScreen extends React.Component {
 
     switchToLandscape() {
         ScreenOrientation.lockAsync(ScreenOrientation.Orientation.LANDSCAPE)
-            .then(_ => this.setState({
-                inFullscreen: true,
-                pageHeight: this.state.pageWidth,
-                pageWidth: this.state.pageHeight
-            }));
+            .then(_ => this.setState({ inFullscreen: true }));
     }
 
     switchToPortrait() {
         ScreenOrientation.lockAsync(ScreenOrientation.Orientation.PORTRAIT)
-            .then(_ => this.setState({
-                inFullscreen: false,
-                pageHeight: this.state.pageWidth,
-                pageWidth: this.state.pageHeight
-            }));
+            .then(_ => this.setState({ inFullscreen: false }));
     }
 
     toggleFavorite() {
@@ -145,7 +135,7 @@ class VideoScreen extends React.Component {
 
     render() {
         const { loadingList, videoList, playingIndex, page,
-            loadingVideo, sourceUri, inFullscreen, pageHeight, pageWidth } = this.state;
+            loadingVideo, sourceUri, inFullscreen } = this.state;
         const { favorites } = this.props;
         const isFavorite = this.animeId in favorites.byIds
         return (
@@ -192,20 +182,21 @@ class VideoScreen extends React.Component {
                         </View>
                     </Surface>
                     <FlatList
-                        data={videoList}
-                        style={{ flexGrow: 0 }}
+                        data={[...videoList, ...Array(4 - videoList.length % 4).fill({ empty: true })]}
                         numColumns={4}
-                        columnWrapperStyle={{ flex: 1, alignContent: "stretch", justifyContent: "flex-start" }}
+                        columnWrapperStyle={{ flex: 1 }}
                         keyExtractor={(_, index) => index}
                         renderItem={({ item, index }) => (
-                            <Button
-                                onPress={
-                                    () => this.setState({ playingIndex: index },
-                                        () => playingIndex !== index && this.fetchSourceUri(videoList[index].url))}
-                                mode={index === playingIndex ? "contained" : "outlined"}
-                                style={styles.button}>
-                                {item.title.match(/\[[^\]]+\]/g).slice(-1)[0].slice(1, -1)}
-                            </Button>
+                            item.empty ?
+                                <View style={{ flex: 1, margin: 4, minWidth: 64 }}></View> :
+                                <Button
+                                    onPress={
+                                        () => this.setState({ playingIndex: index },
+                                            () => playingIndex !== index && this.fetchSourceUri(videoList[index].url))}
+                                    mode={index === playingIndex ? "contained" : "outlined"}
+                                    style={styles.button}>
+                                    {item.title.match(/\[[^\]]+\]/g).slice(-1)[0].slice(1, -1)}
+                                </Button>
                         )}
                         ListFooterComponent={() => (page && (
                             <Button
@@ -228,7 +219,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     button: {
-        width: "23%",
+        flex: 1,
         margin: 4,
     },
     videoPlaceholder: {

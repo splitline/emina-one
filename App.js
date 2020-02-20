@@ -11,7 +11,6 @@ import AnimeList from './screens/AnimeList';
 import VideoScreen from './screens/VideoScreen';
 import AnimeCalendar from './screens/AnimeCalendar';
 import FavoritesList from './screens/FavoritesList';
-import Loading from "./components/fullscreenLoading";
 
 import { store, persistor } from "./redux/store";
 import { PersistGate } from 'redux-persist/integration/react';

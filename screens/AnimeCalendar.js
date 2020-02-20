@@ -55,9 +55,10 @@ const AnimeCalendar = ({ navigation, animeDatas, theme }) => {
                             height: size,
                             bottom: undefined,
                             zIndex: -1,
-                            borderRadius: size
+                            borderRadius: size,
                         }}
-                        tabStyle={{ paddingBottom: 0 }}
+                        tabStyle={{ paddingBottom: 0, }}
+                        style={{ backgroundColor: theme.colors.surface }}
                     />}
             >
                 {["日", "一", "二", "三", "四", "五", "六"].map((day, i) =>
@@ -76,7 +77,7 @@ const AnimeCalendar = ({ navigation, animeDatas, theme }) => {
                                         ...animeDatas[item.id]
                                     }}
                                 />}
-                        />) : (<FullscreenLoading tabLabel={day} key={i}/>)
+                        />) : (<FullscreenLoading tabLabel={day} key={i} />)
                 )}
             </ScrollableTabView>
         </View>
