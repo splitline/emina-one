@@ -36,6 +36,7 @@ export default class AnimePlayer extends React.Component {
             isPlaying: true,
             isBuffering: true,
             isLoading: true,
+            isFinished: false,
 
             controlsOpacity: new Animated.Value(1),
             controlState: ControlStates.Shown
@@ -89,12 +90,14 @@ export default class AnimePlayer extends React.Component {
     }
 
     playbackStatusUpdate(status) {
-        this.setState({
-            positionMillis: status.positionMillis,
-            isBuffering: status.isBuffering,
-            isPlaying: status.isPlaying,
-            isLoading: status.playableDurationMillis <= status.positionMillis
-        })
+        if (!this.state.isFinished)
+            this.setState({
+                positionMillis: status.positionMillis,
+                isBuffering: status.isBuffering,
+                isPlaying: status.isPlaying,
+                isLoading: status.playableDurationMillis <= status.positionMillis,
+                isFinished: status.didJustFinish
+            });
     }
 
     seekingPosition(value) {
@@ -103,7 +106,7 @@ export default class AnimePlayer extends React.Component {
 
     seekingComplete(value) {
         this.videoRef.current.setPositionAsync(value * 1000)
-            .then(() => this.setState({ seekingMillis: undefined }))
+            .then(() => this.setState({ seekingMillis: undefined, isFinished: false }))
     }
 
     handleFullscreen() {
@@ -130,7 +133,7 @@ export default class AnimePlayer extends React.Component {
             controlsOpacity, controlState,
             sourceUri, inFullscreen,
             playbackRate,
-            seekingMillis, durationMillis, positionMillis, isPlaying, isLoading
+            seekingMillis, durationMillis, positionMillis, isPlaying, isLoading, isFinished
         } = this.state;
 
         return (
@@ -149,7 +152,7 @@ export default class AnimePlayer extends React.Component {
                         height: inFullscreen ? '100%' : undefined,
                     }}
                 />
-                {isLoading &&
+                {(!isFinished && isLoading) &&
                     <View style={styles.controls}>
                         <ActivityIndicator color="white" />
                     </View>}
@@ -176,7 +179,6 @@ export default class AnimePlayer extends React.Component {
                                 {inFullscreen &&
                                     <Button
                                         theme={{ roundness: 12 }}
-                                        compact
                                         onPress={() => { }}
                                         color="white"
                                         onPress={() => this.controlsEvent(
@@ -236,7 +238,7 @@ export default class AnimePlayer extends React.Component {
                                     />
                                 </View>}
 
-                            {!isLoading &&
+                            {(!isFinished && !isLoading) &&
                                 <IconButton
                                     icon={isPlaying ? "pause-circle" : "play-circle"}
                                     color="white"
@@ -246,6 +248,17 @@ export default class AnimePlayer extends React.Component {
                                             this.videoRef.current.pauseAsync() :
                                             this.videoRef.current.playAsync())}
                                 />}
+                            {isFinished &&
+                                <IconButton
+                                    icon={"replay"}
+                                    color="white"
+                                    size={48}
+                                    onPress={() => this.controlsEvent(() =>
+                                        this.setState({ isFinished: false },
+                                            () => this.videoRef.current.replayAsync())
+                                    )}
+                                />
+                            }
                             <ActionSheet
                                 gestureEnabled
                                 initialOffsetFromBottom={0.5}
