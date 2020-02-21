@@ -152,10 +152,6 @@ export default class AnimePlayer extends React.Component {
                         height: inFullscreen ? '100%' : undefined,
                     }}
                 />
-                {(!isFinished && isLoading) &&
-                    <View style={styles.controls}>
-                        <ActivityIndicator color="white" />
-                    </View>}
                 <TouchableWithoutFeedback onPress={this.toggleControls.bind(this)}>
                     {controlState !== ControlStates.Hidden ?
                         <Animated.View style={[styles.controls, { opacity: controlsOpacity }]}>
@@ -224,17 +220,19 @@ export default class AnimePlayer extends React.Component {
                                         icon="rewind-10"
                                         color="white"
                                         size={48}
-                                        onPress={() => this.controlsEvent(() =>
+                                        onPress={() => this.controlsEvent(() => {
+                                            this.setState({ isFinished: false });
                                             this.videoRef.current.setPositionAsync(Math.max(positionMillis - 10000, 0))
-                                        )}
+                                        })}
                                     />
                                     <IconButton
                                         icon="fast-forward-10"
                                         color="white"
                                         size={48}
-                                        onPress={() => this.controlsEvent(() =>
+                                        onPress={() => this.controlsEvent(() => {
+                                            this.setState({ isFinished: false });
                                             this.videoRef.current.setPositionAsync(Math.min(positionMillis + 10000, durationMillis))
-                                        )}
+                                        })}
                                     />
                                 </View>}
 
@@ -248,17 +246,6 @@ export default class AnimePlayer extends React.Component {
                                             this.videoRef.current.pauseAsync() :
                                             this.videoRef.current.playAsync())}
                                 />}
-                            {isFinished &&
-                                <IconButton
-                                    icon={"replay"}
-                                    color="white"
-                                    size={48}
-                                    onPress={() => this.controlsEvent(() =>
-                                        this.setState({ isFinished: false },
-                                            () => this.videoRef.current.replayAsync())
-                                    )}
-                                />
-                            }
                             <ActionSheet
                                 gestureEnabled
                                 initialOffsetFromBottom={0.5}
@@ -284,6 +271,21 @@ export default class AnimePlayer extends React.Component {
                         <View style={styles.controls}></View> // empty :)
                     }
                 </TouchableWithoutFeedback>
+                <View style={styles.controls}>
+                    {(!isFinished && isLoading) &&
+                        <ActivityIndicator color="white" />}
+                    {isFinished &&
+                        <IconButton
+                            icon={"replay"}
+                            color="white"
+                            size={48}
+                            onPress={() => this.controlsEvent(() =>
+                                this.setState({ isFinished: false },
+                                    () => this.videoRef.current.replayAsync())
+                            )}
+                        />
+                    }
+                </View>
             </View>
         );
     }
