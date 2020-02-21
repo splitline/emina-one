@@ -154,10 +154,10 @@ export default class AnimePlayer extends React.Component {
                 />
                 <TouchableWithoutFeedback onPress={this.toggleControls.bind(this)}>
                     {controlState !== ControlStates.Hidden ?
-                        <Animated.View style={[styles.controls, { opacity: controlsOpacity }]}>
+                        <Animated.View style={[styles.controls, {opacity: controlsOpacity, backgroundColor:'rgba(0,0,0,0.2)' }]}>
                             <View style={styles.topControls}>
                                 <LinearGradient
-                                    colors={['rgba(0,0,0,0.8)', 'transparent']}
+                                    colors={['rgba(0,0,0,0.6)', 'transparent']}
                                     style={{
                                         position: 'absolute',
                                         left: 0,
@@ -188,7 +188,7 @@ export default class AnimePlayer extends React.Component {
                             </View>
                             <View style={styles.bottomControls}>
                                 <LinearGradient
-                                    colors={['transparent', 'rgba(0,0,0,0.8)']}
+                                    colors={['transparent', 'rgba(0,0,0,0.6)']}
                                     style={{
                                         position: 'absolute',
                                         left: 0,
