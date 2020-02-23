@@ -26,12 +26,12 @@ class FavoritesList extends React.Component {
     }
 
     render() {
-        const { favorites } = this.props;
+        const { favorites, navigation } = this.props;
         return (
             <SafeAreaView style={styles.container}>
                 <Appbar.Header>
                     <Appbar.Content title="收藏的動畫" />
-                    <Appbar.Action icon="information-outline" onPress={() => { }} />
+                    <Appbar.Action icon="information-outline" onPress={() => navigation.navigate("About")} />
                 </Appbar.Header>
                 {favorites.idList.length === 0 ?
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Text, View, AsyncStorage } from 'react-native';
 import { Provider } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 import { SplashScreen } from "expo";
@@ -11,6 +11,7 @@ import AnimeList from './screens/AnimeList';
 import VideoScreen from './screens/VideoScreen';
 import AnimeCalendar from './screens/AnimeCalendar';
 import FavoritesList from './screens/FavoritesList';
+import AboutScreen from './screens/AboutScreen';
 
 import { store, persistor } from "./redux/store";
 import { PersistGate } from 'redux-persist/integration/react';
@@ -82,9 +83,13 @@ function Home({ navigation }) {
 function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator headerMode="none">
+      <Stack.Navigator
+        headerMode="none"
+        mode="modal"
+      >
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Video" component={VideoScreen} />
+        <Stack.Screen name="About" component={AboutScreen} options={{cardStyleInterpolator: CardStyleInterpolators.forScaleFromCenterAndroid}} />
       </Stack.Navigator>
     </NavigationContainer>
   );

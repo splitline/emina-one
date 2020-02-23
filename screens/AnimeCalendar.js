@@ -39,7 +39,7 @@ const AnimeCalendar = ({ navigation, animeDatas, theme }) => {
         <View style={{ flex: 1 }}>
             <Appbar.Header>
                 <Appbar.Content title="新番時間表" subtitle={currentSeason} />
-                <Appbar.Action icon="information-outline" onPress={() => { }} />
+                <Appbar.Action icon="information-outline" onPress={() => navigation.navigate("About")} />
             </Appbar.Header>
             <ScrollableTabView
                 prerenderingSiblingsNumber={1}

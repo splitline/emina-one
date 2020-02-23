@@ -98,6 +98,7 @@ class AnimeList extends React.Component {
   }
 
   render() {
+    const { navigation } = this.props;
     const { refreshing, searching } = this.state;
     return (
       <SafeAreaView style={styles.container}>
@@ -115,7 +116,7 @@ class AnimeList extends React.Component {
           <Appbar.Header>
             <Appbar.Content title="所有動畫" />
             <Appbar.Action icon="magnify" onPress={() => this.setState({ searching: !searching })} />
-            <Appbar.Action icon="information-outline" onPress={() => { }} />
+            <Appbar.Action icon="information-outline" onPress={() => navigation.navigate("About")} />
           </Appbar.Header>}
         <View>
           <ScrollView keyboardShouldPersistTaps="always" horizontal>
