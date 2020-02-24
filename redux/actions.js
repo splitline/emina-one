@@ -1,4 +1,4 @@
-import { ADD_FAVORITE, REMOVE_FAVORITE, SET_ANIME_DATAS } from "./actionTypes";
+import { ADD_FAVORITE, REMOVE_FAVORITE, SET_ANIME_DATAS, PUSH_HISTORY } from "./actionTypes";
 
 
 export const addFavorite = (id, data) => ({
@@ -14,4 +14,14 @@ export const removeFavorite = (id) => ({
 export const setAnimeDatas = (data) => ({
     type: SET_ANIME_DATAS,
     payload: data.reduce((obj, item) => (obj[+item.id] = item, obj) ,{})
+})
+
+export const pushHistory = (animeId, videoId, title) => ({
+    type: PUSH_HISTORY,
+    payload: {
+        animeId,
+        lastWatch: +(new Date()),
+        videoId,
+        title
+    }
 })

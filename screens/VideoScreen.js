@@ -101,6 +101,7 @@ class VideoScreen extends React.Component {
                 const document = parse(html);
                 const result = document.querySelectorAll("article")
                     .map(elem => ({
+                        id: elem.getAttribute('id').split('-')[1],
                         title: elem.querySelector(".entry-title").text,
                         date: elem.querySelector('time').text,
                         url: elem.querySelector('iframe')?.getAttribute('src') || elem.querySelector('button')?.getAttribute('data-src'),
@@ -153,6 +154,11 @@ class VideoScreen extends React.Component {
                         switchToLandscape={() => this.switchToLandscape()}
                         switchToPortrait={() => this.switchToPortrait()}
                         goBack={() => this.props.navigation.goBack()}
+                        animeData={{
+                            animeId: this.animeId,
+                            videoId: videoList[playingIndex]?.id,
+                            title: videoList[playingIndex]?.title
+                        }}
                     />
                 }
                 <Surface style={styles.titleContainer}>

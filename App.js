@@ -12,6 +12,7 @@ import VideoScreen from './screens/VideoScreen';
 import AnimeCalendar from './screens/AnimeCalendar';
 import FavoritesList from './screens/FavoritesList';
 import AboutScreen from './screens/AboutScreen';
+import WatchHistory from './screens/WatchHistory';
 
 import { store, persistor } from "./redux/store";
 import { PersistGate } from 'redux-persist/integration/react';
@@ -64,7 +65,7 @@ function Home({ navigation }) {
       />
       <Tab.Screen
         name="觀看紀錄"
-        component={HomeScreen}
+        component={WatchHistory}
         options={{
           tabBarIcon: 'history',
         }}

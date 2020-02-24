@@ -4,6 +4,9 @@ import { Video, Audio } from 'expo-av';
 import { Button, IconButton, ActivityIndicator, List } from "react-native-paper";
 import { LinearGradient } from 'expo-linear-gradient';
 import ActionSheet from 'react-native-actions-sheet';
+import { connect } from 'react-redux';
+
+import { pushHistory } from "../redux/actions";
 
 const millisToTime = ms => {
     const totalSeconds = ms / 1000;
@@ -19,7 +22,7 @@ const ControlStates = {
     Hiding: 3
 };
 
-export default class AnimePlayer extends React.Component {
+class AnimePlayer extends React.Component {
     constructor(props) {
         super(props);
         this.videoRef = React.createRef();
@@ -29,6 +32,7 @@ export default class AnimePlayer extends React.Component {
             sourceUri: this.props.sourceUri,
             inFullscreen: this.props.inFullscreen,
 
+            played: false,
             playbackRate: 1.0,
             seekingMillis: undefined,
             durationMillis: 0,
@@ -130,12 +134,13 @@ export default class AnimePlayer extends React.Component {
 
     render() {
         const {
+            played,
             controlsOpacity, controlState,
             sourceUri, inFullscreen,
             playbackRate,
             seekingMillis, durationMillis, positionMillis, isPlaying, isLoading, isFinished
         } = this.state;
-
+        const { animeData, pushHistory } = this.props;
         return (
             <View>
                 <Video
@@ -154,7 +159,7 @@ export default class AnimePlayer extends React.Component {
                 />
                 <TouchableWithoutFeedback onPress={this.toggleControls.bind(this)}>
                     {controlState !== ControlStates.Hidden ?
-                        <Animated.View style={[styles.controls, {opacity: controlsOpacity, backgroundColor:'rgba(0,0,0,0.2)' }]}>
+                        <Animated.View style={[styles.controls, { opacity: controlsOpacity, backgroundColor: 'rgba(0,0,0,0.2)' }]}>
                             <View style={styles.topControls}>
                                 <LinearGradient
                                     colors={['rgba(0,0,0,0.6)', 'transparent']}
@@ -241,10 +246,21 @@ export default class AnimePlayer extends React.Component {
                                     icon={isPlaying ? "pause-circle" : "play-circle"}
                                     color="white"
                                     size={48}
-                                    onPress={() => this.controlsEvent(() =>
-                                        isPlaying ?
-                                            this.videoRef.current.pauseAsync() :
-                                            this.videoRef.current.playAsync())}
+                                    onPress={() => this.controlsEvent(() => {
+                                        if (isPlaying)
+                                            this.videoRef.current.pauseAsync();
+                                        else {
+                                            this.videoRef.current.playAsync();
+                                            if (!played) {
+                                                this.setState({ played: true });
+                                                this.props.pushHistory(
+                                                    animeData.animeId,
+                                                    animeData.videoId,
+                                                    animeData.title
+                                                );
+                                            }
+                                        }
+                                    })}
                                 />}
                             <ActionSheet
                                 gestureEnabled
@@ -328,3 +344,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row'
     }
 });
+
+export default connect(
+    undefined,
+    { pushHistory }
+)(AnimePlayer);
