@@ -8,7 +8,8 @@ const persistConfig = {
     key: 'root',
     storage: AsyncStorage,
     whitelist: [
-        'favorites'
+        'favorites',
+        'history'
     ]
 };
 

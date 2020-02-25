@@ -12,15 +12,19 @@ const AboutScreen = ({ navigation, history }) => {
             </Appbar.Header>
             {Object.entries(history)
                 .sort((a, b) => b[1].lastWatch - a[1].lastWatch)
-                .map((data, i) =>
+                .map(([animeId, data], i) =>
                     <List.Accordion
                         key={i}
-                        title={data[1].watchedList[0].title}
-                        description={new Date(data[1].watchedList[0].lastWatch)+""}
+                        title={data.watchedList[0].title}
+                        description={new Date(data.watchedList[0].lastWatch) + ""}
                         left={props => <List.Icon {...props} icon="folder" />}
                     >
-                        {data[1].watchedList.map((item, i) =>
-                            <List.Item key={i} title={item.title} />
+                        {data.watchedList.map((item, i) =>
+                            <List.Item
+                                key={i}
+                                title={item.title}
+                                onPress={() => navigation.navigate("Video", { animeId, videoId: item.id })}
+                            />
                         )}
                     </List.Accordion>
                 )}

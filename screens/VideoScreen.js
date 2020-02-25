@@ -15,10 +15,12 @@ class VideoScreen extends React.Component {
         super(props);
         this.animeId = this.props.route.params.animeId;
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => this.handleBackPress());
+
         this.state = {
             loadingList: true,
             videoList: new Map(),
-            playingIndex: undefined,
+            playingId: this.props.route.params.videoId,
+            currentVideoTmp: undefined,
             page: 1,
 
             loadingVideo: true,
@@ -30,9 +32,25 @@ class VideoScreen extends React.Component {
     componentDidMount() {
         activateKeepAwake();
         this.fetchVideoList()
-            .then(({result, firstId}) => {
-                console.log(result, firstId);
-                this.fetchSourceUri(result.get(firstId).url)
+            .then(({ result, playingId }) => {
+                if (result.has(playingId))
+                    this.fetchSourceUri(result.get(playingId).url);
+                else {
+                    fetch(`https://anime1.me/${playingId}`)
+                        .then(r => r.text())
+                        .then(html => {
+                            const document = parse(html);
+                            const elem = document.querySelector("article");
+                            this.setState({
+                                currentVideoTmp: {
+                                    title: elem.querySelector(".entry-title").text,
+                                    date: elem.querySelector('time').text,
+                                    url: elem.querySelector('iframe')?.getAttribute('src') || elem.querySelector('button')?.getAttribute('data-src'),
+                                    pageURL: `https://anime1.me/${elem.getAttribute('id').split('-')[1]}`
+                                }
+                            }, () => this.fetchSourceUri(this.state.currentVideoTmp.url));
+                        });
+                }
             });
     }
 
@@ -101,7 +119,9 @@ class VideoScreen extends React.Component {
             .then(html => {
                 if (html.includes("上一頁")) this.setState({ page: page + 1 });
                 else this.setState({ page: null });
+
                 const document = parse(html);
+                const { videoList, playingId } = this.state;
 
                 // Map will keep its order.
                 const result = new Map(
@@ -116,16 +136,12 @@ class VideoScreen extends React.Component {
                         ])
                 );
 
-                const firstId = this.state.videoList.size ?
-                    this.state.videoList.keys().next().value : 
-                    result.keys().next().value; // get first key
-
                 this.setState({
-                    videoList: new Map([...this.state.videoList, ...result]),
-                    playingIndex: firstId, 
+                    videoList: new Map([...videoList, ...result]),
+                    playingId: playingId || result.keys().next().value,  // current playingId or first key
                     loadingList: false
                 });
-                return { result, firstId };
+                return { result, playingId: playingId || result.keys().next().value };
             });
     }
 
@@ -151,11 +167,11 @@ class VideoScreen extends React.Component {
 
 
     render() {
-        const { loadingList, videoList, playingIndex, page,
+        const { loadingList, videoList, playingId, page, currentVideoTmp,
             loadingVideo, sourceUri, inFullscreen } = this.state;
         const { favorites } = this.props;
         const isFavorite = this.animeId in favorites.byIds;
-        const currentVideo = videoList.get(playingIndex);
+        const currentVideo = videoList.get(playingId) || currentVideoTmp;
 
         return (
             <View style={styles.container}>
@@ -174,7 +190,7 @@ class VideoScreen extends React.Component {
                         goBack={() => this.props.navigation.goBack()}
                         animeData={{
                             animeId: this.animeId,
-                            videoId: currentVideo?.id,
+                            videoId: playingId,
                             title: currentVideo?.title
                         }}
                     />
@@ -214,9 +230,9 @@ class VideoScreen extends React.Component {
                             <View style={{ flex: 1, margin: 4, minWidth: 64 }}></View> :
                             <Button
                                 onPress={
-                                    () => this.setState({ playingIndex: id },
-                                        () => playingIndex !== id && this.fetchSourceUri(videoList.get(id).url))}
-                                mode={id === playingIndex ? "contained" : "outlined"}
+                                    () => this.setState({ playingId: id },
+                                        () => playingId !== id && this.fetchSourceUri(videoList.get(id).url))}
+                                mode={id === playingId ? "contained" : "outlined"}
                                 style={styles.button}>
                                 {data.title.match(/\[[^\]]+\]/g).slice(-1)[0].slice(1, -1)}
                             </Button>
