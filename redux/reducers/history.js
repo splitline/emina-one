@@ -21,14 +21,6 @@ export default function (state = initialState, action) {
             const { animeId, lastWatch, videoId, title } = action.payload;
             const watchedList = state[animeId]?.watchedList || [];
 
-            console.log([
-                {
-                    id: videoId,
-                    title,
-                    lastWatch
-                },
-                ...watchedList?.filter(item => item.id !== videoId)
-            ]);
             return {
                 ...state,
                 [animeId]: {

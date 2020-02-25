@@ -17,8 +17,8 @@ class VideoScreen extends React.Component {
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', () => this.handleBackPress());
         this.state = {
             loadingList: true,
-            videoList: [],
-            playingIndex: 0,
+            videoList: new Map(),
+            playingIndex: undefined,
             page: 1,
 
             loadingVideo: true,
@@ -30,7 +30,10 @@ class VideoScreen extends React.Component {
     componentDidMount() {
         activateKeepAwake();
         this.fetchVideoList()
-            .then(result => this.fetchSourceUri(result[0].url));
+            .then(({result, firstId}) => {
+                console.log(result, firstId);
+                this.fetchSourceUri(result.get(firstId).url)
+            });
     }
 
     handleBackPress() {
@@ -99,17 +102,30 @@ class VideoScreen extends React.Component {
                 if (html.includes("上一頁")) this.setState({ page: page + 1 });
                 else this.setState({ page: null });
                 const document = parse(html);
-                const result = document.querySelectorAll("article")
-                    .map(elem => ({
-                        id: elem.getAttribute('id').split('-')[1],
-                        title: elem.querySelector(".entry-title").text,
-                        date: elem.querySelector('time').text,
-                        url: elem.querySelector('iframe')?.getAttribute('src') || elem.querySelector('button')?.getAttribute('data-src'),
-                        pageURL: `https://anime1.me/${elem.getAttribute('id').split('-')[1]}`
-                    }));
 
-                this.setState({ videoList: [...this.state.videoList, ...result], playingIndex: 0, loadingList: false });
-                return result;
+                // Map will keep its order.
+                const result = new Map(
+                    document.querySelectorAll("article")
+                        .map(elem => [
+                            elem.getAttribute('id').split('-')[1], {
+                                title: elem.querySelector(".entry-title").text,
+                                date: elem.querySelector('time').text,
+                                url: elem.querySelector('iframe')?.getAttribute('src') || elem.querySelector('button')?.getAttribute('data-src'),
+                                pageURL: `https://anime1.me/${elem.getAttribute('id').split('-')[1]}`
+                            }
+                        ])
+                );
+
+                const firstId = this.state.videoList.size ?
+                    this.state.videoList.keys().next().value : 
+                    result.keys().next().value; // get first key
+
+                this.setState({
+                    videoList: new Map([...this.state.videoList, ...result]),
+                    playingIndex: firstId, 
+                    loadingList: false
+                });
+                return { result, firstId };
             });
     }
 
@@ -138,7 +154,9 @@ class VideoScreen extends React.Component {
         const { loadingList, videoList, playingIndex, page,
             loadingVideo, sourceUri, inFullscreen } = this.state;
         const { favorites } = this.props;
-        const isFavorite = this.animeId in favorites.byIds
+        const isFavorite = this.animeId in favorites.byIds;
+        const currentVideo = videoList.get(playingIndex);
+
         return (
             <View style={styles.container}>
                 <StatusBar hidden />
@@ -148,7 +166,7 @@ class VideoScreen extends React.Component {
                         <Text style={{ color: "white", marginVertical: 8 }}>獲取影片網址中</Text>
                     </View> :
                     <AnimePlayer
-                        title={videoList[playingIndex]?.title}
+                        title={currentVideo?.title}
                         sourceUri={sourceUri}
                         inFullscreen={inFullscreen}
                         switchToLandscape={() => this.switchToLandscape()}
@@ -156,14 +174,14 @@ class VideoScreen extends React.Component {
                         goBack={() => this.props.navigation.goBack()}
                         animeData={{
                             animeId: this.animeId,
-                            videoId: videoList[playingIndex]?.id,
-                            title: videoList[playingIndex]?.title
+                            videoId: currentVideo?.id,
+                            title: currentVideo?.title
                         }}
                     />
                 }
                 <Surface style={styles.titleContainer}>
-                    <Title>{videoList[playingIndex]?.title}</Title>
-                    <Caption>上架時間：{videoList[playingIndex]?.date}</Caption>
+                    <Title>{currentVideo?.title}</Title>
+                    <Caption>上架時間：{currentVideo?.date}</Caption>
                     <Divider />
                     <View style={{ flex: 0, flexDirection: "row", justifyContent: "space-around" }}>
                         <IconButton
@@ -174,7 +192,7 @@ class VideoScreen extends React.Component {
                         <IconButton
                             color="#757575"
                             icon="share"
-                            onPress={() => Share.share({ message: videoList[playingIndex]?.title + "\n" + videoList[playingIndex]?.pageURL })}
+                            onPress={() => Share.share({ message: currentVideo?.title + "\n" + currentVideo?.pageURL })}
                         />
                         <IconButton
                             color="#757575"
@@ -184,20 +202,23 @@ class VideoScreen extends React.Component {
                     </View>
                 </Surface>
                 <FlatList
-                    data={[...videoList, ...Array(4 - videoList.length % 4).fill({ empty: true })]}
+                    data={[
+                        ...videoList.entries(),
+                        ...Array(4 - videoList.size % 4).fill([null])
+                    ]}
                     numColumns={4}
                     columnWrapperStyle={{ flex: 1 }}
                     keyExtractor={(_, index) => index}
-                    renderItem={({ item, index }) => (
-                        item.empty ?
+                    renderItem={({ item: [id, data] }) => (
+                        id === null ?
                             <View style={{ flex: 1, margin: 4, minWidth: 64 }}></View> :
                             <Button
                                 onPress={
-                                    () => this.setState({ playingIndex: index },
-                                        () => playingIndex !== index && this.fetchSourceUri(videoList[index].url))}
-                                mode={index === playingIndex ? "contained" : "outlined"}
+                                    () => this.setState({ playingIndex: id },
+                                        () => playingIndex !== id && this.fetchSourceUri(videoList.get(id).url))}
+                                mode={id === playingIndex ? "contained" : "outlined"}
                                 style={styles.button}>
-                                {item.title.match(/\[[^\]]+\]/g).slice(-1)[0].slice(1, -1)}
+                                {data.title.match(/\[[^\]]+\]/g).slice(-1)[0].slice(1, -1)}
                             </Button>
                     )}
                     ListFooterComponent={() => (page && (
