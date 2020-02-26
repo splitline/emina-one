@@ -196,7 +196,7 @@ class VideoScreen extends React.Component {
                     />
                 }
                 {!inFullscreen &&
-                    <View>
+                    <View style={{ flex: 1 }}>
                         <Surface style={styles.titleContainer}>
                             <Title>{currentVideo?.title}</Title>
                             <Caption>上架時間：{currentVideo?.date}</Caption>

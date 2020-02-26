@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, TouchableWithoutFeedback, Slider, Animated, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableWithoutFeedback, Slider, Animated, Dimensions } from 'react-native';
 import { Video, Audio } from 'expo-av';
 import { Button, IconButton, ActivityIndicator, List } from "react-native-paper";
 import { LinearGradient } from 'expo-linear-gradient';
@@ -28,6 +28,7 @@ class AnimePlayer extends React.Component {
         this.videoRef = React.createRef();
         this.actionSheetRef = React.createRef();
         this.controlsTimeout = null;
+        this.videoHeight = Math.min(Dimensions.get('window').width, Dimensions.get('window').height);
         this.state = {
             sourceUri: this.props.sourceUri,
             inFullscreen: this.props.inFullscreen,
@@ -141,6 +142,7 @@ class AnimePlayer extends React.Component {
             seekingMillis, durationMillis, positionMillis, isPlaying, isLoading, isFinished
         } = this.state;
         const { animeData, pushHistory } = this.props;
+
         return (
             <View>
                 <Video
@@ -154,7 +156,7 @@ class AnimePlayer extends React.Component {
                         backgroundColor: 'black',
                         aspectRatio: !inFullscreen ? 16 / 9 : undefined,
                         width: '100%',
-                        height: inFullscreen ? '100%' : undefined,
+                        height: inFullscreen ? this.videoHeight : undefined,
                     }}
                 />
                 <TouchableWithoutFeedback onPress={this.toggleControls.bind(this)}>
@@ -253,7 +255,7 @@ class AnimePlayer extends React.Component {
                                             this.videoRef.current.playAsync();
                                             if (!played) {
                                                 this.setState({ played: true });
-                                                this.props.pushHistory(
+                                                pushHistory(
                                                     animeData.animeId,
                                                     animeData.videoId,
                                                     animeData.title

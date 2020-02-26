@@ -1,7 +1,5 @@
 import * as React from 'react';
 import { Text, View, StyleSheet, Share, Linking, Alert } from 'react-native';
-import { connect } from 'react-redux';
-import { persistor } from "../redux/store";
 import { Appbar, List, Surface, Card, Title, Paragraph, Avatar } from 'react-native-paper';
 
 const styles = StyleSheet.create({
