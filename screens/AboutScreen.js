@@ -6,7 +6,8 @@ import { Appbar, List, Surface, Card, Title, Paragraph, Avatar } from 'react-nat
 
 const styles = StyleSheet.create({
     card: {
-        margin: 8,
+        backgroundColor: 'white',
+        margin: 16,
         elevation: 3
     }
 })
@@ -14,8 +15,8 @@ const styles = StyleSheet.create({
 const AboutScreen = ({ navigation }) => {
     return (
         <View>
-            <Appbar.Header>
-                <Appbar.Content title="Emina One" />
+            <Appbar.Header dark statusBarHeight={0} style={{backgroundColor:'white'}}>
+                <Appbar.BackAction color="black" onPress={() => navigation.goBack()} />
             </Appbar.Header>
             <Card style={styles.card}>
                 <Card.Title

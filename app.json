@@ -28,7 +28,10 @@
     },
     "android": {
       "package": "com.splitline.eminaone",
-      "versionCode": 1
-    }
+      "versionCode": 1,
+      "permissions": []
+    },
+    "description": "一個 Anime1.me 的非官方 app (ˊ・ω・ˋ)",
+    "githubUrl": "https://github.com/splitline/emina-one"
   }
 }

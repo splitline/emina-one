@@ -195,57 +195,60 @@ class VideoScreen extends React.Component {
                         }}
                     />
                 }
-                <Surface style={styles.titleContainer}>
-                    <Title>{currentVideo?.title}</Title>
-                    <Caption>上架時間：{currentVideo?.date}</Caption>
-                    <Divider />
-                    <View style={{ flex: 0, flexDirection: "row", justifyContent: "space-around" }}>
-                        <IconButton
-                            color={isFavorite ? this.props.theme.colors.primary : '#757575'}
-                            icon={isFavorite ? "heart" : "heart-outline"}
-                            onPress={() => this.toggleFavorite()}
+                {!inFullscreen &&
+                    <View>
+                        <Surface style={styles.titleContainer}>
+                            <Title>{currentVideo?.title}</Title>
+                            <Caption>上架時間：{currentVideo?.date}</Caption>
+                            <Divider />
+                            <View style={{ flex: 0, flexDirection: "row", justifyContent: "space-around" }}>
+                                <IconButton
+                                    color={isFavorite ? this.props.theme.colors.primary : '#757575'}
+                                    icon={isFavorite ? "heart" : "heart-outline"}
+                                    onPress={() => this.toggleFavorite()}
+                                />
+                                <IconButton
+                                    color="#757575"
+                                    icon="share"
+                                    onPress={() => Share.share({ message: currentVideo?.title + "\n" + currentVideo?.pageURL })}
+                                />
+                                <IconButton
+                                    color="#757575"
+                                    icon="open-in-new"
+                                    onPress={() => IntentLauncher.startActivityAsync('android.intent.action.VIEW', { data: sourceUri })}
+                                />
+                            </View>
+                        </Surface>
+                        <FlatList
+                            data={[
+                                ...videoList.entries(),
+                                ...Array(4 - videoList.size % 4).fill([null])
+                            ]}
+                            numColumns={4}
+                            columnWrapperStyle={{ flex: 1 }}
+                            keyExtractor={(_, index) => index}
+                            renderItem={({ item: [id, data] }) => (
+                                id === null ?
+                                    <View style={{ flex: 1, margin: 4, minWidth: 64 }}></View> :
+                                    <Button
+                                        onPress={
+                                            () => this.setState({ playingId: id },
+                                                () => playingId !== id && this.fetchSourceUri(videoList.get(id).url))}
+                                        mode={id === playingId ? "contained" : "outlined"}
+                                        style={styles.button}>
+                                        {data.title.match(/\[[^\]]+\]/g).slice(-1)[0].slice(1, -1)}
+                                    </Button>
+                            )}
+                            ListFooterComponent={() => (page && (
+                                <Button
+                                    disabled={loadingList}
+                                    loading={loadingList}
+                                    onPress={() => this.fetchVideoList()}>
+                                    {loadingList ? "載入章節列表中" : "載入更多集數"}
+                                </Button>
+                            ))}
                         />
-                        <IconButton
-                            color="#757575"
-                            icon="share"
-                            onPress={() => Share.share({ message: currentVideo?.title + "\n" + currentVideo?.pageURL })}
-                        />
-                        <IconButton
-                            color="#757575"
-                            icon="open-in-new"
-                            onPress={() => IntentLauncher.startActivityAsync('android.intent.action.VIEW', { data: sourceUri })}
-                        />
-                    </View>
-                </Surface>
-                <FlatList
-                    data={[
-                        ...videoList.entries(),
-                        ...Array(4 - videoList.size % 4).fill([null])
-                    ]}
-                    numColumns={4}
-                    columnWrapperStyle={{ flex: 1 }}
-                    keyExtractor={(_, index) => index}
-                    renderItem={({ item: [id, data] }) => (
-                        id === null ?
-                            <View style={{ flex: 1, margin: 4, minWidth: 64 }}></View> :
-                            <Button
-                                onPress={
-                                    () => this.setState({ playingId: id },
-                                        () => playingId !== id && this.fetchSourceUri(videoList.get(id).url))}
-                                mode={id === playingId ? "contained" : "outlined"}
-                                style={styles.button}>
-                                {data.title.match(/\[[^\]]+\]/g).slice(-1)[0].slice(1, -1)}
-                            </Button>
-                    )}
-                    ListFooterComponent={() => (page && (
-                        <Button
-                            disabled={loadingList}
-                            loading={loadingList}
-                            onPress={() => this.fetchVideoList()}>
-                            {loadingList ? "載入章節列表中" : "載入更多集數"}
-                        </Button>
-                    ))}
-                />
+                    </View>}
             </View>
         );
     }
