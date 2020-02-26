@@ -1,4 +1,4 @@
-import { PUSH_HISTORY } from '../actionTypes'
+import { PUSH_HISTORY, CLEAR_HISTORY } from '../actionTypes'
 
 const initialState = {
     // 123: {
@@ -17,6 +17,8 @@ const initialState = {
 
 export default function (state = initialState, action) {
     switch (action.type) {
+        case CLEAR_HISTORY:
+            return {};
         case PUSH_HISTORY:
             const { animeId, lastWatch, videoId, title } = action.payload;
             const watchedList = state[animeId]?.watchedList || [];
