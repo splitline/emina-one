@@ -1,9 +1,11 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, FlatList, SafeAreaView } from 'react-native';
+import { Text, View, StyleSheet, FlatList, SafeAreaView, UIManager, LayoutAnimation } from 'react-native';
 import { connect } from 'react-redux';
 import { Appbar } from 'react-native-paper';
 import AnimeEntry from "../components/AnimeEntry";
 
+UIManager.setLayoutAnimationEnabledExperimental &&
+  UIManager.setLayoutAnimationEnabledExperimental(true);
 
 const styles = StyleSheet.create({
     container: {
@@ -17,9 +19,19 @@ class FavoritesList extends React.Component {
         this.navigation = this.props.navigation;
     }
 
+    setAnimation = () => {
+        LayoutAnimation.configureNext({
+          duration: 150,
+          update: {
+            type: LayoutAnimation.Types.easeIn,
+            springDamping: 0.1,
+          },
+        });
+    }
 
     renderRow = ({ item }) => {
         const { animeDatas } = this.props;
+        this.setAnimation();
         return (
             <AnimeEntry {...animeDatas[item]} navigation={this.navigation} />
         )
