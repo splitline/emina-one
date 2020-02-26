@@ -23,7 +23,15 @@
   - 前進、後退十秒
 
 ## 截圖
-[TBA]
+
+<div align="center">
+<img src="https://github.com/splitline/emina-one/blob/master/screenshots/animeList.png?raw=true" width="250" />
+<img src="https://github.com/splitline/emina-one/blob/master/screenshots/calendar.png?raw=true" width="250" />
+<img src="https://github.com/splitline/emina-one/blob/master/screenshots/favorites.png?raw=true" width="250" />
+<img src="https://github.com/splitline/emina-one/blob/master/screenshots/watchHistory.png?raw=true" width="250" />
+<img src="https://github.com/splitline/emina-one/blob/master/screenshots/videoScreen.png?raw=true" width="250" />
+<img src="https://github.com/splitline/emina-one/blob/master/screenshots/player.png?raw=true" width="500" />
+</div>
 
 ## 下載
 - [Expo](https://expo.io/@splitline/eminaOne)
