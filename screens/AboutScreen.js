@@ -42,7 +42,7 @@ const AboutScreen = ({ navigation }) => {
                 />
             </Card>
 
-            <Card style={styles.card}>
+            {/* <Card style={styles.card}>
                 <List.Item
                     title="清除資料"
                     description="包含觀看紀錄、收藏的動畫"
@@ -54,7 +54,7 @@ const AboutScreen = ({ navigation }) => {
                         { text: "取消", style: "cancel" }
                     ])}
                 />
-            </Card>
+            </Card> */}
         </View>
     )
 }
