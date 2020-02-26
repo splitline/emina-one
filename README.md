@@ -35,7 +35,7 @@
 
 ## 下載
 - [Expo](https://expo.io/@splitline/eminaOne)
-- [Apk (Release Page)](https://github.com/seven332/EhViewer/releases)
+- [Apk (Release Page)](https://github.com/splitline/emina-one/releases)
 
 ## 相關 App
 如果你用不慣我做的，可以參考其他人寫的同性質 App。
