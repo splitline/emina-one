@@ -27,16 +27,15 @@ const WatchHistory = ({ navigation, history, clearHistory }) => {
                                 { text: "確定", onPress: () => clearHistory() },
                                 { text: "取消", style: "cancel" }
                             ])}
-                            style={{ alignSelf: "flex-end", margin:4 }}
+                            style={{ alignSelf: "flex-end", margin: 4 }}
                             compact
                         >
                             清除紀錄
                         </Button>}
                     data={Object.entries(history).sort((a, b) => b[1].lastWatch - a[1].lastWatch)}
-                    ItemSeparatorComponent={() => <Divider />}
                     keyExtractor={(item) => item[0]}
                     renderItem={({ item: [animeId, data] }) =>
-                        <Surface>
+                        <Surface style={{ margin: 8, elevation: 3 }}>
                             <List.Accordion
                                 title={data.watchedList[0].title}
                                 titleNumberOfLines={0}

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Text, View, StyleSheet, FlatList, SafeAreaView, UIManager, LayoutAnimation } from 'react-native';
 import { connect } from 'react-redux';
-import { Appbar } from 'react-native-paper';
+import { Appbar, Surface } from 'react-native-paper';
 import AnimeEntry from "../components/AnimeEntry";
 
 UIManager.setLayoutAnimationEnabledExperimental &&
@@ -45,6 +45,7 @@ class FavoritesList extends React.Component {
                     <Appbar.Content title="收藏的動畫" />
                     <Appbar.Action icon="information-outline" onPress={() => navigation.navigate("About")} />
                 </Appbar.Header>
+                <Surface style={styles.container}>
                 {favorites.idList.length === 0 ?
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                         <Text>該去收藏點東西了吧</Text>
@@ -55,6 +56,7 @@ class FavoritesList extends React.Component {
                         keyExtractor={item => `${item}`}
                     />
                 }
+                </Surface>
             </SafeAreaView>
         );
     }

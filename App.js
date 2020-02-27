@@ -44,7 +44,8 @@ function Home({ navigation }) {
       backBehavior="initialRoute"
       initialRouteName="animeList"
       activeColor={theme.colors.primary}
-      barStyle={{ backgroundColor: theme.colors.surface }}
+      barStyle={{ backgroundColor: theme.colors.surface, elevation: 10 }}
+      sceneAnimationEnabled={false}
     >
       <Tab.Screen
         name="animeList"
@@ -84,10 +85,7 @@ function Home({ navigation }) {
 function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        headerMode="none"
-        mode="modal"
-      >
+      <Stack.Navigator headerMode="none" mode="modal">
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Video" component={VideoScreen} />
         <Stack.Screen name="About" component={AboutScreen} options={{cardStyleInterpolator: CardStyleInterpolators.forModalPresentationIOS}} />

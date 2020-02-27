@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Text, View, StyleSheet, ScrollView, BackHandler, RefreshControl, Dimensions, KeyboardAvoidingView, SafeAreaView } from 'react-native';
 import { parse } from 'node-html-parser';
 import { connect } from 'react-redux';
-import { List, Appbar, Searchbar, Chip } from 'react-native-paper';
+import { Appbar, Searchbar, Chip, Surface } from 'react-native-paper';
 import { RecyclerListView, DataProvider, LayoutProvider } from "recyclerlistview";
 
 import AnimeEntry from "../components/AnimeEntry";
@@ -118,37 +118,38 @@ class AnimeList extends React.Component {
             <Appbar.Action icon="magnify" onPress={() => this.setState({ searching: !searching })} />
             <Appbar.Action icon="information-outline" onPress={() => navigation.navigate("About")} />
           </Appbar.Header>}
-        <View>
-          <ScrollView keyboardShouldPersistTaps="always" horizontal>
-            {["連載中", "劇場版", "OVA", "OAD", ...getPastSeasons()].map(
-              (text, i) =>
-                <Chip
-                  key={i}
-                  style={{ marginHorizontal: 4, marginVertical: 8 }}
-                  onPress={() => this.search(text)}
-                  selected={this.state.searchText === text.toLowerCase()}>
-                  {text}
-                </Chip>)}
-          </ScrollView>
-        </View>
-        {this.state.dataProvider.getSize() !== 0 ?
-          <RecyclerListView
-            dataProvider={this.state.dataProvider}
-            layoutProvider={this.state.layoutProvider}
-            rowRenderer={this.renderRow}
-            style={{ flex: 1 }}
-            scrollViewProps={{
-              refreshControl: !searching && <RefreshControl refreshing={refreshing} onRefresh={() => this.fetchData()} />,
-              keyboardShouldPersistTaps: "always"
-            }}
-          /> :
-          refreshing ?
-            <FullscreenLoading /> :
-            <View style={{ flex: 1, paddingTop: 24, alignItems: 'center' }} >
-              <Text>這裡什麼都沒有 (´；ω；｀)</Text>
-            </View>
-
-        }
+        <Surface style={styles.container}>
+          <View>
+            <ScrollView keyboardShouldPersistTaps="always" horizontal>
+              {["連載中", "劇場版", "OVA", "OAD", ...getPastSeasons()].map(
+                (text, i) =>
+                  <Chip
+                    key={i}
+                    style={{ marginHorizontal: 4, marginVertical: 8 }}
+                    onPress={() => this.search(text)}
+                    selected={this.state.searchText === text.toLowerCase()}>
+                    {text}
+                  </Chip>)}
+            </ScrollView>
+          </View>
+          {this.state.dataProvider.getSize() !== 0 ?
+            <RecyclerListView
+              dataProvider={this.state.dataProvider}
+              layoutProvider={this.state.layoutProvider}
+              rowRenderer={this.renderRow}
+              style={{ flex: 1 }}
+              scrollViewProps={{
+                refreshControl: !searching && <RefreshControl refreshing={refreshing} onRefresh={() => this.fetchData()} />,
+                keyboardShouldPersistTaps: "always"
+              }}
+            /> :
+            refreshing ?
+              <FullscreenLoading /> :
+              <View style={{ flex: 1, paddingTop: 24, alignItems: 'center' }} >
+                <Text>這裡什麼都沒有 (´；ω；｀)</Text>
+              </View>
+          }
+        </Surface>
       </SafeAreaView>
     );
   }

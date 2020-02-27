@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, Dimensions } from 'react-native';
 import ScrollableTabView, { DefaultTabBar } from 'react-native-scrollable-tab-view';
-import { Appbar, withTheme } from "react-native-paper";
+import { Appbar, Surface, withTheme } from "react-native-paper";
 import { parse } from 'node-html-parser';
 import { connect } from 'react-redux';
 
@@ -41,45 +41,47 @@ const AnimeCalendar = ({ navigation, animeDatas, theme }) => {
                 <Appbar.Content title="新番時間表" subtitle={currentSeason} />
                 <Appbar.Action icon="information-outline" onPress={() => navigation.navigate("About")} />
             </Appbar.Header>
-            <ScrollableTabView
-                prerenderingSiblingsNumber={1}
-                initialPage={today}
-                renderTabBar={() =>
-                    <DefaultTabBar
-                        activeTextColor="white"
-                        underlineStyle={{
-                            backgroundColor: theme.colors.primary,
-                            alignSelf: 'center',
-                            margin: margin,
-                            width: size,
-                            height: size,
-                            bottom: undefined,
-                            zIndex: -1,
-                            borderRadius: size,
-                        }}
-                        tabStyle={{ paddingBottom: 0, }}
-                        style={{ backgroundColor: theme.colors.surface }}
-                    />}
-            >
-                {["日", "一", "二", "三", "四", "五", "六"].map((day, i) =>
-                    calendar[i] ?
-                        (<FlatList
-                            key={i}
-                            tabLabel={day}
-                            data={calendar[i]}
-                            keyExtractor={item => `${item.id}`}
-                            renderItem={({ item }) =>
-                                <AnimeEntry
-                                    navigation={navigation}
-                                    {...{
-                                        id: item.id,
-                                        title: item.title,
-                                        ...animeDatas[item.id]
-                                    }}
-                                />}
-                        />) : (<FullscreenLoading tabLabel={day} key={i} />)
-                )}
-            </ScrollableTabView>
+            <Surface style={{ flex: 1 }}>
+                <ScrollableTabView
+                    prerenderingSiblingsNumber={1}
+                    initialPage={today}
+                    renderTabBar={() =>
+                        <DefaultTabBar
+                            activeTextColor="white"
+                            underlineStyle={{
+                                backgroundColor: theme.colors.primary,
+                                alignSelf: 'center',
+                                margin: margin,
+                                width: size,
+                                height: size,
+                                bottom: undefined,
+                                zIndex: -1,
+                                borderRadius: size,
+                            }}
+                            tabStyle={{ paddingBottom: 0, }}
+                            style={{ backgroundColor: theme.colors.surface, elevation: 4 }}
+                        />}
+                >
+                    {["日", "一", "二", "三", "四", "五", "六"].map((day, i) =>
+                        calendar[i] ?
+                            (<FlatList
+                                key={i}
+                                tabLabel={day}
+                                data={calendar[i]}
+                                keyExtractor={item => `${item.id}`}
+                                renderItem={({ item }) =>
+                                    <AnimeEntry
+                                        navigation={navigation}
+                                        {...{
+                                            id: item.id,
+                                            title: item.title,
+                                            ...animeDatas[item.id]
+                                        }}
+                                    />}
+                            />) : (<FullscreenLoading tabLabel={day} key={i} />)
+                    )}
+                </ScrollableTabView>
+            </Surface>
         </View>
     )
 };
