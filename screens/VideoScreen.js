@@ -4,7 +4,6 @@ import { parse } from 'node-html-parser';
 import { Title, Button, ActivityIndicator, Surface, Divider, Caption, IconButton, withTheme } from 'react-native-paper';
 import { connect } from 'react-redux';
 
-import { ScreenOrientation } from 'expo';
 import * as IntentLauncher from 'expo-intent-launcher';
 import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
 import AnimePlayer from "../components/AnimePlayer";
@@ -146,13 +145,11 @@ class VideoScreen extends React.Component {
     }
 
     switchToLandscape() {
-        ScreenOrientation.lockAsync(ScreenOrientation.Orientation.LANDSCAPE)
-            .then(_ => this.setState({ inFullscreen: true }));
+        // TODO:
     }
 
     switchToPortrait() {
-        ScreenOrientation.lockAsync(ScreenOrientation.Orientation.PORTRAIT)
-            .then(_ => this.setState({ inFullscreen: false }));
+        // TODO:
     }
 
     toggleFavorite() {

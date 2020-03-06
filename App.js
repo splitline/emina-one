@@ -5,8 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
-import { SplashScreen } from "expo";
-
+// TODO: Splash screen
 import AnimeList from './screens/AnimeList';
 import VideoScreen from './screens/VideoScreen';
 import AnimeCalendar from './screens/AnimeCalendar';
@@ -24,8 +23,6 @@ const theme = {
     primary: '#e4017e' // from anime1.me icon
   },
 };
-
-SplashScreen.preventAutoHide()
 
 const Tab = createMaterialBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -96,7 +93,7 @@ function App() {
 
 export default () =>
   <Provider store={store}>
-    <PersistGate loading={null} onBeforeLift={() => SplashScreen.hide()} persistor={persistor}>
+    <PersistGate loading={null} persistor={persistor}>
       <PaperProvider theme={theme}>
         <App />
       </PaperProvider>
