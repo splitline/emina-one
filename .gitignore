@@ -12,3 +12,7 @@ web-report/
 
 # macOS
 .DS_Store
+
+# Bundle artifact
+*.jsbundle
+Pods
