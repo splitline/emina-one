@@ -210,7 +210,7 @@ class AnimePlayer extends React.Component {
                                     onSlidingComplete={value => this.controlsEvent(this.seekingComplete.bind(this), true, value)}
                                     maximumValue={durationMillis / 1000}
                                     step={1}
-                                    value={(seekingMillis || positionMillis) / 1000}
+                                    value={(seekingMillis || positionMillis || 0) / 1000}
                                     style={{ flex: 1 }}
                                 />
                                 <IconButton
