@@ -16,3 +16,9 @@ web-report/
 # Bundle artifact
 *.jsbundle
 Pods
+/ios/Pods/
+
+# Android/IntelliJ
+#
+build/
+.gradle
