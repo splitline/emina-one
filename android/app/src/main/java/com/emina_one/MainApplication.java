@@ -3,14 +3,13 @@ package com.emina_one;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.reactnativecommunity.viewpager.RNCViewPagerPackage;
+import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.emina_one.generated.BasePackageList;
-import com.swmansion.reanimated.ReanimatedPackage;
-import com.swmansion.rnscreens.RNScreensPackage;
-import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 
 import org.unimodules.adapters.react.ReactAdapterPackage;
 import org.unimodules.adapters.react.ModuleRegistryAdapter;
@@ -20,6 +19,7 @@ import org.unimodules.core.interfaces.SingletonModule;
 import expo.modules.constants.ConstantsPackage;
 import expo.modules.permissions.PermissionsPackage;
 import expo.modules.filesystem.FileSystemPackage;
+import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,9 +40,9 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-          new ReanimatedPackage(),
+            new RNCViewPagerPackage(),
+          new SafeAreaContextPackage(),
           new RNGestureHandlerPackage(),
-          new RNScreensPackage(),
           new ModuleRegistryAdapter(mModuleRegistryProvider)
       );
     }

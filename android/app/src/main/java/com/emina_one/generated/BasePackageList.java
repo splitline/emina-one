@@ -10,6 +10,7 @@ public class BasePackageList {
         new expo.modules.av.AVPackage(),
         new expo.modules.constants.ConstantsPackage(),
         new expo.modules.filesystem.FileSystemPackage(),
+        new expo.modules.font.FontLoaderPackage(),
         new expo.modules.intentlauncher.IntentLauncherPackage(),
         new expo.modules.keepawake.KeepAwakePackage(),
         new expo.modules.lineargradient.LinearGradientPackage(),
