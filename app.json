@@ -1,37 +1,4 @@
 {
-  "expo": {
-    "name": "Emina One",
-    "slug": "eminaOne",
-    "privacy": "public",
-    "sdkVersion": "36.0.0",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
-    "assetBundlePatterns": [
-      "assets/*"
-    ],
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "package": "com.splitline.eminaone",
-      "versionCode": 1,
-      "permissions": []
-    },
-    "description": "一個 Anime1.me 的非官方 app (ˊ・ω・ˋ)",
-    "githubUrl": "https://github.com/splitline/emina-one"
-  }
+  "displayName": "emina_one",
+  "name": "emina_one"
 }
