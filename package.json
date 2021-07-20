@@ -22,7 +22,7 @@
     "node-html-parser": "^1.2.4",
     "react": "~16.13.0",
     "react-dom": "~16.13.0",
-    "react-native": "~0.61.4",
+    "react-native": "~0.62.3",
     "react-native-actions-sheet": "^0.2.0",
     "react-native-gesture-handler": "^1.6.0",
     "react-native-paper": "^3.6.0",
